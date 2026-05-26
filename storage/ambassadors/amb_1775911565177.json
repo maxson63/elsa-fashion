@@ -1,0 +1,38 @@
+{
+  "_id": "amb_1775911565177",
+  "email": "adstik110@gmail.com",
+  "password": "maxson",
+  "isVerified": false,
+  "balance": 0,
+  "clearanceStatus": "pending",
+  "clearancePaymentStatus": "pending",
+  "profile": null,
+  "selectedOutfits": [
+    {
+      "id": 1,
+      "name": "Elegant Evening Gown",
+      "price": 700,
+      "image": "https://i.pinimg.com/236x/54/65/71/54657119e25f9669ae67338728c693ca.jpg?nii=t",
+      "category": "Evening Wear",
+      "selectedAt": "2026-04-11T12:46:05.177Z"
+    },
+    {
+      "id": 7,
+      "name": "Exclusive High Fashion Ensemble",
+      "price": 1100,
+      "image": "https://i.pinimg.com/originals/51/ec/eb/51eceb8d2f04e68ce2cb0b696466fae6.jpg",
+      "category": "Haute Couture",
+      "selectedAt": "2026-04-11T12:46:05.177Z"
+    },
+    {
+      "id": 14,
+      "name": "Ultimate Couture Masterpiece",
+      "price": 2000,
+      "image": "https://tse1.mm.bing.net/th/id/OIP.putbwjQJMOZx_AlF0lVC2QHaLj?pid=ImgDet&w=474&h=739&rs=1&o=7&rm=3",
+      "category": "Ultimate Couture",
+      "selectedAt": "2026-04-11T12:46:05.177Z"
+    }
+  ],
+  "createdAt": "2026-04-11T12:46:05.177Z",
+  "accountType": "ambassador"
+}

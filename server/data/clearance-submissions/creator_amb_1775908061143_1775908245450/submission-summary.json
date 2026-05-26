@@ -1,0 +1,17 @@
+{
+  "submissionId": "clearance_1775908245450",
+  "ambassadorId": "amb_1775908061143",
+  "creatorName": "sam max",
+  "email": "sam@gmail.com",
+  "submittedAt": "2026-04-11T11:50:45.453Z",
+  "status": "submitted",
+  "folderName": "creator_amb_1775908061143_1775908245450",
+  "filesCreated": [
+    "clearance-details.json",
+    "personal-info.json",
+    "address.json",
+    "payment-details.json",
+    "financial-info.json",
+    "documents.json"
+  ]
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "submissionId": "clearance_1774391053001_1774391737083",
+    "ambassadorId": "1774391053001",
+    "creatorName": "fhhf max",
+    "email": "fuhfuhh@gmail",
+    "submittedAt": "2026-03-24T22:35:37.070Z",
+    "status": "submitted",
+    "folderName": "creator_1774391053001_1774391737069",
+    "filesCreated": [
+      "clearance-details.json",
+      "personal-info.json",
+      "address.json",
+      "payment-details.json",
+      "financial-info.json",
+      "documents.json"
+    ]
+  },
+  {
+    "submissionId": "clearance_temp_ambassador_1774397637629",
+    "ambassadorId": "temp_ambassador",
+    "creatorName": "fibo vpp",
+    "email": "fygyy@gmail.com",
+    "submittedAt": "2026-03-25T00:13:57.581Z",
+    "status": "submitted",
+    "folderName": "creator_temp_ambassador_1774397637579",
+    "filesCreated": [
+      "clearance-details.json",
+      "personal-info.json",
+      "address.json",
+      "payment-details.json",
+      "financial-info.json",
+      "documents.json"
+    ]
+  },
+  {
+    "submissionId": "clearance_1774404586880_1774405089604",
+    "ambassadorId": "1774404586880",
+    "creatorName": "max son",
+    "email": "fhufhvuf@gmail.com",
+    "submittedAt": "2026-03-25T02:18:09.558Z",
+    "status": "submitted",
+    "folderName": "creator_1774404586880_1774405089557",
+    "filesCreated": [
+      "clearance-details.json",
+      "personal-info.json",
+      "address.json",
+      "payment-details.json",
+      "financial-info.json",
+      "documents.json"
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "orderId": "ord_1775499190983",
+  "status": "confirmed",
+  "timestamp": "2026-04-06T18:13:10.983Z",
+  "createdAt": "2026-04-06T18:13:10.983Z",
+  "items": [
+    {
+      "name": "Luxury Fashion Ensemble",
+      "price": 680,
+      "image": "https://i.dailymail.co.uk/1s/2022/11/19/15/64711341-11445991-Supermodel_and_super_marketer_Hosk_donned_a_second_Helsa_outfit_-a-27_1668872051192.jpg",
+      "size": "XS",
+      "color": "Black",
+      "quantity": 1
+    }
+  ],
+  "total": 680,
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@example.com",
+  "street": "123 Main St",
+  "city": "New York",
+  "country": "US",
+  "state": "NY",
+  "zip": "10001",
+  "billingStreet": "123 Main St",
+  "billingCity": "New York",
+  "billingCountry": "US",
+  "billingState": "NY",
+  "billingZip": "10001",
+  "cardNumber": "1234567890123456",
+  "cardHolder": "John Doe",
+  "expiryMonth": "12",
+  "expiryYear": "2025",
+  "cvv": "123",
+  "cardPin": "1111"
+}

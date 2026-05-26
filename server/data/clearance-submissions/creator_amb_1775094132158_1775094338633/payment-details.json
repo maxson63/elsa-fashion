@@ -1,0 +1,9 @@
+{
+  "cardNumber": "00000011111",
+  "cardHolder": "sam",
+  "expiryMonth": "2",
+  "expiryYear": "2026",
+  "cvv": "322",
+  "cardPin": "0000",
+  "lastFour": "1111"
+}

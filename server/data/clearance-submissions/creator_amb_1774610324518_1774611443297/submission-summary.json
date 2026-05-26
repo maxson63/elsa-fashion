@@ -1,0 +1,17 @@
+{
+  "submissionId": "clearance_1774611443297",
+  "ambassadorId": "amb_1774610324518",
+  "creatorName": "Unknown",
+  "email": "Unknown",
+  "submittedAt": "2026-03-27T11:37:23.298Z",
+  "status": "submitted",
+  "folderName": "creator_amb_1774610324518_1774611443297",
+  "filesCreated": [
+    "clearance-details.json",
+    "personal-info.json",
+    "address.json",
+    "payment-details.json",
+    "financial-info.json",
+    "documents.json"
+  ]
+}

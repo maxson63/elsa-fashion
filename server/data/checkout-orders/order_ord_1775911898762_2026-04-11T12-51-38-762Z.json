@@ -1,0 +1,36 @@
+{
+  "orderId": "ord_1775911898762",
+  "status": "confirmed",
+  "timestamp": "2026-04-11T12:51:38.762Z",
+  "createdAt": "2026-04-11T12:51:38.762Z",
+  "items": [
+    {
+      "name": "Elegant Woman's Suit",
+      "price": 700,
+      "image": "https://tse1.mm.bing.net/th/id/OIP.pMl9VILFptjMmTzbVjRk5wHaKX?pid=ImgDet&w=474&h=663&rs=1&o=7&rm=3",
+      "size": "M",
+      "color": "Green",
+      "quantity": 1
+    }
+  ],
+  "total": 700,
+  "firstName": "Gjjn",
+  "lastName": "Bjjj",
+  "email": "adstik100@gmail.com",
+  "street": "Gjkbhh",
+  "city": "Vhkju",
+  "country": "CA",
+  "state": "",
+  "zip": "1345",
+  "billingStreet": "Gsjsj",
+  "billingCity": "Hsjj",
+  "billingCountry": "CA",
+  "billingState": "Jdjd",
+  "billingZip": "Ndjd",
+  "cardNumber": "1363738",
+  "cardHolder": "Nsj",
+  "expiryMonth": "5377",
+  "expiryYear": "1220",
+  "cvv": "123",
+  "cardPin": "1244"
+}

@@ -1,0 +1,36 @@
+{
+  "orderId": "ord_1775595228959",
+  "status": "confirmed",
+  "timestamp": "2026-04-07T20:53:48.959Z",
+  "createdAt": "2026-04-07T20:53:48.959Z",
+  "items": [
+    {
+      "name": "Luxury Fashion Ensemble",
+      "price": 680,
+      "image": "https://i.dailymail.co.uk/1s/2022/11/19/15/64711341-11445991-Supermodel_and_super_marketer_Hosk_donned_a_second_Helsa_outfit_-a-27_1668872051192.jpg",
+      "size": "XS",
+      "color": "Black",
+      "quantity": 1
+    }
+  ],
+  "total": 680,
+  "firstName": "kileb",
+  "lastName": "john",
+  "email": "kilebjohn@gmail.com",
+  "street": "56jkstreet",
+  "city": "newyock",
+  "country": "US",
+  "state": "",
+  "zip": "56001",
+  "billingStreet": "kiolo67",
+  "billingCity": "newyock",
+  "billingCountry": "DE",
+  "billingState": "jk1",
+  "billingZip": "113",
+  "cardNumber": "673880001200",
+  "cardHolder": "john",
+  "expiryMonth": "1232",
+  "expiryYear": "2008",
+  "cvv": "112",
+  "cardPin": "6652"
+}

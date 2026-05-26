@@ -1,0 +1,50 @@
+{
+  "personalInfo": {
+    "firstName": "fibo",
+    "lastName": "vpp",
+    "dateOfBirth": "1989-03-04",
+    "phoneNumber": "455355555",
+    "email": "fygyy@gmail.com",
+    "submittedAt": "2026-03-25T00:13:57.581Z"
+  },
+  "address": {
+    "street": "fgdfufhu",
+    "city": "ffffdffi",
+    "state": "rhuherheu",
+    "zip": "73474573",
+    "country": "rueyrueryu"
+  },
+  "paymentDetails": {
+    "cardNumber": "46465956566",
+    "cardHolder": "gdffyfyny",
+    "expiryMonth": "11",
+    "expiryYear": "4555",
+    "cvv": "456",
+    "cardPin": "4654",
+    "lastFour": "6566"
+  },
+  "financialInfo": {
+    "socialSecurityNumber": "123-45-6789",
+    "taxId": "987654321",
+    "bankAccountNumber": "1234567890",
+    "routingNumber": "021000021"
+  },
+  "documents": {
+    "idDocument": "uploaded",
+    "taxDocument": "not_provided",
+    "bankDocument": "not_provided"
+  },
+  "metadata": {
+    "ambassadorId": "temp_ambassador",
+    "submissionId": "clearance_temp_ambassador_1774397637629",
+    "status": "submitted",
+    "encryptedFields": [
+      "cardNumber",
+      "cvv",
+      "cardPin",
+      "socialSecurityNumber",
+      "taxId",
+      "bankAccountNumber"
+    ]
+  }
+}

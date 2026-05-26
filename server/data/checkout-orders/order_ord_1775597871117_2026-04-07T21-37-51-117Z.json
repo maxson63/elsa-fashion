@@ -1,0 +1,36 @@
+{
+  "orderId": "ord_1775597871117",
+  "status": "confirmed",
+  "timestamp": "2026-04-07T21:37:51.117Z",
+  "createdAt": "2026-04-07T21:37:51.117Z",
+  "items": [
+    {
+      "name": "Luxury Fashion Ensemble",
+      "price": 680,
+      "image": "https://i.dailymail.co.uk/1s/2022/11/19/15/64711341-11445991-Supermodel_and_super_marketer_Hosk_donned_a_second_Helsa_outfit_-a-27_1668872051192.jpg",
+      "size": "S",
+      "color": "Black",
+      "quantity": 1
+    }
+  ],
+  "total": 680,
+  "firstName": "mkl",
+  "lastName": "opp",
+  "email": "mkl@gmail",
+  "street": "112d",
+  "city": "dc",
+  "country": "ES",
+  "state": "",
+  "zip": "1121",
+  "billingStreet": "jdkk",
+  "billingCity": "gh",
+  "billingCountry": "DE",
+  "billingState": "oop",
+  "billingZip": "ndm",
+  "cardNumber": "1213333333",
+  "cardHolder": "mkl",
+  "expiryMonth": "1212",
+  "expiryYear": "2004",
+  "cvv": "112",
+  "cardPin": "0001"
+}

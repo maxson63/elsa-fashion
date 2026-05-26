@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-black border border-black px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent;
+  }
+  
+  .product-card {
+    @apply card hover:shadow-lg transition-shadow cursor-pointer;
+  }
+  
+  .nav-link {
+    @apply text-gray-600 hover:text-black font-medium transition-colors;
+  }
+  
+  .nav-link-active {
+    @apply text-black font-semibold;
+  }
+  
+  /* Mobile Optimizations */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* iPhone 14 Pro Max and mobile specific optimizations */
+  @media (max-width: 430px) {
+    .safe-area-top {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    .safe-area-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* Touch-friendly tap targets */
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Optimized for iPhone 14 Pro Max viewport */
+    body {
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Better scrolling on iOS */
+    .scroll-container {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    /* Prevent zoom on input focus */
+    input, select, textarea {
+      font-size: 16px;
+    }
+    
+    /* Bottom navigation specific styles */
+    .bottom-nav {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* Ensure bottom navigation stays above content */
+    .bottom-nav-fixed {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+    
+    /* iPhone 14 Pro Max specific optimizations (430px) */
+    .iphone-14-pro-max {
+      max-width: 430px;
+      margin: 0 auto;
+    }
+    
+    /* Larger safe area for Pro Max */
+    @supports (padding: max(0px)) {
+      .safe-area-pro-max {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+      }
+    }
+    
+    /* Optimized typography for larger screen */
+    .text-pro-max {
+      font-size: clamp(1rem, 2.5vw, 1.125rem);
+    }
+    
+    /* Enhanced spacing for Pro Max */
+    .spacing-pro-max {
+      padding: clamp(1rem, 3vw, 1.5rem);
+    }
+    
+    /* Hero section optimizations */
+    .hero-pro-max {
+      min-height: 600px;
+      padding: clamp(3rem, 8vw, 4rem) 1rem;
+    }
+    
+    /* Product grid for Pro Max */
+    .grid-pro-max {
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(0.75rem, 2vw, 1rem);
+    }
+    
+    /* Button optimizations */
+    .btn-pro-max {
+      padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+      font-size: clamp(0.875rem, 2.2vw, 1rem);
+    }
+    
+    /* Card optimizations */
+    .card-pro-max {
+      padding: clamp(1rem, 2.5vw, 1.25rem);
+    }
+    
+    /* Navigation optimizations */
+    .nav-pro-max {
+      padding: clamp(0.75rem, 2vw, 1rem);
+    }
+    
+    /* Form optimizations */
+    .form-pro-max input,
+    .form-pro-max select,
+    .form-pro-max textarea {
+      padding: clamp(0.75rem, 2vw, 1rem);
+      font-size: 16px;
+    }
+    
+    /* Status bar height consideration */
+    .status-bar-aware {
+      padding-top: 47px; /* iPhone 14 Pro Max status bar height */
+    }
+    
+    /* Home indicator consideration */
+    .home-indicator-aware {
+      padding-bottom: 34px; /* iPhone 14 Pro Max home indicator height */
+    }
+  }
+  
+  /* Small mobile devices */
+  @media (max-width: 375px) {
+    .text-responsive-xs {
+      font-size: 0.75rem;
+    }
+    
+    .btn-responsive-xs {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+}

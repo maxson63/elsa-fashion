@@ -1,0 +1,36 @@
+{
+  "orderId": "ord_1775594270982",
+  "status": "confirmed",
+  "timestamp": "2026-04-07T20:37:50.982Z",
+  "createdAt": "2026-04-07T20:37:50.982Z",
+  "items": [
+    {
+      "name": "Elegant Woman's Suit",
+      "price": 700,
+      "image": "https://tse1.mm.bing.net/th/id/OIP.pMl9VILFptjMmTzbVjRk5wHaKX?pid=ImgDet&w=474&h=663&rs=1&o=7&rm=3",
+      "size": "S",
+      "color": "Blue",
+      "quantity": 1
+    }
+  ],
+  "total": 700,
+  "firstName": "lm",
+  "lastName": "om",
+  "email": "lmom@gmail.com",
+  "street": "1tv ",
+  "city": "bn",
+  "country": "ES",
+  "state": "",
+  "zip": "1266",
+  "billingStreet": "6tv",
+  "billingCity": "bn",
+  "billingCountry": "",
+  "billingState": "uk",
+  "billingZip": "1000",
+  "cardNumber": "0999000",
+  "cardHolder": "",
+  "expiryMonth": "1232",
+  "expiryYear": "",
+  "cvv": "111",
+  "cardPin": "0000"
+}

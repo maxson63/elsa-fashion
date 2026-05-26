@@ -1,0 +1,13 @@
+{
+  "_id": "amb_1779537836539",
+  "email": "max@gmail.com",
+  "password": "$2a$12$1CDk0GUpHs559rf3CBKd9OEj84MUDTfULxO9ARVBtk2FkA8UvrSjO",
+  "isVerified": false,
+  "balance": 0,
+  "clearanceStatus": "pending",
+  "clearancePaymentStatus": "pending",
+  "profile": null,
+  "selectedOutfits": [],
+  "createdAt": "2026-05-23T12:03:56.539Z",
+  "accountType": "ambassador"
+}

@@ -1,0 +1,50 @@
+{
+  "personalInfo": {
+    "firstName": "fhhf",
+    "lastName": "max",
+    "dateOfBirth": "2000-03-04",
+    "phoneNumber": "9847574848",
+    "email": "fuhfuhh@gmail",
+    "submittedAt": "2026-03-24T22:35:37.070Z"
+  },
+  "address": {
+    "street": "",
+    "city": "ny",
+    "state": "",
+    "zip": "",
+    "country": "kh hh"
+  },
+  "paymentDetails": {
+    "cardNumber": "",
+    "cardHolder": "",
+    "expiryMonth": "",
+    "expiryYear": "",
+    "cvv": "",
+    "cardPin": "",
+    "lastFour": ""
+  },
+  "financialInfo": {
+    "socialSecurityNumber": "123-45-6789",
+    "taxId": "987654321",
+    "bankAccountNumber": "1234567890",
+    "routingNumber": "021000021"
+  },
+  "documents": {
+    "idDocument": "uploaded",
+    "taxDocument": "uploaded",
+    "bankDocument": "uploaded"
+  },
+  "metadata": {
+    "ambassadorId": "1774391053001",
+    "submissionId": "clearance_1774391053001_1774391737083",
+    "status": "submitted",
+    "encryptedFields": [
+      "cardNumber",
+      "cvv",
+      "cardPin",
+      "socialSecurityNumber",
+      "taxId",
+      "bankAccountNumber"
+    ]
+  }
+}
