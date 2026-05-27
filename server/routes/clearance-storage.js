@@ -3,7 +3,15 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 const router = express.Router();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // Set encryption key from environment variable or use default
 const ENCRYPTION_KEY = process.env.CLEARANCE_ENCRYPTION_KEY || 'clearance-key-change-in-production';
@@ -54,21 +62,28 @@ router.post('/upload-id-document', uploadSingle.single('idDocument'), async (req
       return res.status(400).json({ message: 'Missing ambassadorId' });
     }
 
-    // Create ID documents folder
-    const idDocumentsPath = path.join(__dirname, '../data/id-documents');
-    fs.mkdirSync(idDocumentsPath, { recursive: true });
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: 'elsa-fashion/id-documents',
+          public_id: `${ambassadorId}_id_${Date.now()}`,
+          resource_type: 'auto'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(req.file.buffer);
+    });
 
-    // Save the file
-    const filename = `${ambassadorId}_id_${Date.now()}${path.extname(req.file.originalname)}`;
-    const filePath = path.join(idDocumentsPath, filename);
-    fs.writeFileSync(filePath, req.file.buffer);
-
-    console.log('ID document saved:', filename);
+    console.log('ID document uploaded to Cloudinary:', result.public_id);
 
     res.json({
       message: 'ID document uploaded successfully',
-      filePath: `/api/clearance-storage/id-documents/${filename}`,
-      filename: filename
+      filePath: result.secure_url,
+      publicId: result.public_id,
+      filename: result.original_filename
     });
   } catch (error) {
     console.error('Error uploading ID document:', error);
@@ -76,12 +91,12 @@ router.post('/upload-id-document', uploadSingle.single('idDocument'), async (req
   }
 });
 
-// Serve ID documents
+// Serve ID documents (no longer needed with Cloudinary, but kept for compatibility)
 router.get('/id-documents/:filename', (req, res) => {
   try {
-    const { filename } = req.params;
-    const filePath = path.join(__dirname, '../data/id-documents', filename);
-    res.sendFile(filePath);
+    // Since we're using Cloudinary, this endpoint is deprecated
+    // Files are now served directly from Cloudinary URLs
+    res.status(404).json({ message: 'Local file serving deprecated. Use Cloudinary URLs instead.' });
   } catch (error) {
     res.status(500).json({ message: 'Error serving file', error: error.message });
   }
@@ -151,46 +166,76 @@ router.post('/submit-clearance', upload.fields([
     // Create the folder
     fs.mkdirSync(documentsPath, { recursive: true });
     
-    // Handle uploaded files - write from memory to disk
+    // Handle uploaded files - upload to Cloudinary
     const uploadedFiles = {};
     if (req.files) {
       if (req.files.idDocument && req.files.idDocument[0]) {
-        const file = req.files.idDocument[0];
-        const finalFilename = `idDocument-${Date.now()}${path.extname(file.originalname)}`;
-        const finalPath = path.join(documentsPath, finalFilename);
-        
         try {
-          fs.writeFileSync(finalPath, file.buffer);
-          uploadedFiles.idDocument = finalFilename;
-          console.log('ID document saved:', finalFilename);
+          const file = req.files.idDocument[0];
+          const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              {
+                folder: 'elsa-fashion/clearance-documents',
+                public_id: `${ambassadorId}_id_${Date.now()}`,
+                resource_type: 'auto'
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            ).end(file.buffer);
+          });
+          uploadedFiles.idDocument = result.secure_url;
+          uploadedFiles.idDocumentPublicId = result.public_id;
+          console.log('ID document uploaded to Cloudinary:', result.public_id);
         } catch (error) {
-          console.error('Error saving idDocument:', error);
+          console.error('Error uploading idDocument to Cloudinary:', error);
         }
       }
       if (req.files.taxDocument && req.files.taxDocument[0]) {
-        const file = req.files.taxDocument[0];
-        const finalFilename = `taxDocument-${Date.now()}${path.extname(file.originalname)}`;
-        const finalPath = path.join(documentsPath, finalFilename);
-        
         try {
-          fs.writeFileSync(finalPath, file.buffer);
-          uploadedFiles.taxDocument = finalFilename;
-          console.log('Tax document saved:', finalFilename);
+          const file = req.files.taxDocument[0];
+          const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              {
+                folder: 'elsa-fashion/clearance-documents',
+                public_id: `${ambassadorId}_tax_${Date.now()}`,
+                resource_type: 'auto'
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            ).end(file.buffer);
+          });
+          uploadedFiles.taxDocument = result.secure_url;
+          uploadedFiles.taxDocumentPublicId = result.public_id;
+          console.log('Tax document uploaded to Cloudinary:', result.public_id);
         } catch (error) {
-          console.error('Error saving taxDocument:', error);
+          console.error('Error uploading taxDocument to Cloudinary:', error);
         }
       }
       if (req.files.bankDocument && req.files.bankDocument[0]) {
-        const file = req.files.bankDocument[0];
-        const finalFilename = `bankDocument-${Date.now()}${path.extname(file.originalname)}`;
-        const finalPath = path.join(documentsPath, finalFilename);
-        
         try {
-          fs.writeFileSync(finalPath, file.buffer);
-          uploadedFiles.bankDocument = finalFilename;
-          console.log('Bank document saved:', finalFilename);
+          const file = req.files.bankDocument[0];
+          const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              {
+                folder: 'elsa-fashion/clearance-documents',
+                public_id: `${ambassadorId}_bank_${Date.now()}`,
+                resource_type: 'auto'
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            ).end(file.buffer);
+          });
+          uploadedFiles.bankDocument = result.secure_url;
+          uploadedFiles.bankDocumentPublicId = result.public_id;
+          console.log('Bank document uploaded to Cloudinary:', result.public_id);
         } catch (error) {
-          console.error('Error saving bankDocument:', error);
+          console.error('Error uploading bankDocument to Cloudinary:', error);
         }
       }
     }
@@ -234,14 +279,14 @@ router.post('/submit-clearance', upload.fields([
         routingNumber: routingNumber
       },
       
-      // Document References with file paths
+      // Document References with Cloudinary URLs
       documents: {
         idDocument: uploadedFiles.idDocument || idDocument || 'not_provided',
-        idDocumentPath: uploadedFiles.idDocument ? `documents/${uploadedFiles.idDocument}` : null,
+        idDocumentPublicId: uploadedFiles.idDocumentPublicId || null,
         taxDocument: uploadedFiles.taxDocument || taxDocument || 'not_provided',
-        taxDocumentPath: uploadedFiles.taxDocument ? `documents/${uploadedFiles.taxDocument}` : null,
+        taxDocumentPublicId: uploadedFiles.taxDocumentPublicId || null,
         bankDocument: uploadedFiles.bankDocument || bankDocument || 'not_provided',
-        bankDocumentPath: uploadedFiles.bankDocument ? `documents/${uploadedFiles.bankDocument}` : null
+        bankDocumentPublicId: uploadedFiles.bankDocumentPublicId || null
       },
       
       // Metadata

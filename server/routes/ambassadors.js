@@ -2,9 +2,25 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 const router = express.Router();
+
+// MongoDB Schema for Ambassador
+const AmbassadorSchema = new mongoose.Schema({
+  _id: String,
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  isVerified: { type: Boolean, default: false },
+  balance: { type: Number, default: 0 },
+  clearanceStatus: { type: String, default: 'pending' },
+  clearancePaymentStatus: { type: String, default: 'pending' },
+  profile: Object,
+  selectedOutfits: [{ type: String }],
+  createdAt: { type: String, default: () => new Date().toISOString() },
+  accountType: { type: String, default: 'ambassador' }
+});
+
+const Ambassador = mongoose.model('Ambassador', AmbassadorSchema);
 
 // Register ambassador
 router.post('/register', async (req, res) => {
@@ -16,9 +32,15 @@ router.post('/register', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     
+    // Check if ambassador already exists
+    const existingAmbassador = await Ambassador.findOne({ email });
+    if (existingAmbassador) {
+      return res.status(400).json({ message: 'Ambassador already exists' });
+    }
+    
     // Create ambassador object
     const ambassadorId = `amb_${Date.now()}`;
-    const ambassador = {
+    const ambassador = new Ambassador({
       _id: ambassadorId,
       email,
       password: password,
@@ -30,16 +52,10 @@ router.post('/register', async (req, res) => {
       selectedOutfits: [],
       createdAt: new Date().toISOString(),
       accountType: 'ambassador'
-    };
+    });
     
-    // Save to storage folder
-    const storageDir = path.join(__dirname, '../../storage/ambassadors');
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
-    }
-    
-    const filePath = path.join(storageDir, `${ambassadorId}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(ambassador, null, 2));
+    // Save to MongoDB
+    await ambassador.save();
     
     // Generate JWT token
     const token = jwt.sign(
@@ -78,19 +94,16 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     
-    // Mock ambassador data
-    const ambassador = {
-      _id: Date.now().toString(),
-      email,
-      isVerified: false,
-      balance: 0,
-      clearanceStatus: 'pending'
-    };
+    // Find ambassador in MongoDB
+    const ambassador = await Ambassador.findOne({ email });
+    if (!ambassador) {
+      return res.status(401).json({ message: 'Ambassador not found' });
+    }
     
     // Generate token
     const token = jwt.sign(
       { ambassadorId: ambassador._id, type: 'ambassador' },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '7d' }
     );
     
@@ -114,8 +127,7 @@ router.post('/login', async (req, res) => {
 // Get ambassador profile
 router.get('/profile', auth, async (req, res) => {
   try {
-    const ambassador = await Ambassador.findById(req.ambassadorId)
-      .populate('selectedOutfits');
+    const ambassador = await Ambassador.findById(req.ambassadorId);
     
     if (!ambassador) {
       return res.status(404).json({ message: 'Ambassador not found' });

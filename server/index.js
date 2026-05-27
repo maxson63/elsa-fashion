@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const ambassadorRoutes = require('./routes/ambassadors');
 const productRoutes = require('./routes/products');
@@ -14,6 +15,12 @@ const checkoutRoutes = require('./routes/checkout');
 const userRoutes = require('./routes/users');
 
 const app = express();
+
+// MongoDB Connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/elsa-fashion';
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 // Security middleware
 app.use(helmet());
@@ -77,9 +84,9 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/users', userRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} (without MongoDB)`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;

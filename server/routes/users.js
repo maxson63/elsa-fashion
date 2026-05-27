@@ -1,12 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-// Mock user data storage
-const users = [];
-const userDeliveries = new Map(); // Map user email to delivery data
+// MongoDB Schema for User
+const UserSchema = new mongoose.Schema({
+  _id: String,
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  firstName: String,
+  lastName: String,
+  createdAt: { type: String, default: () => new Date().toISOString() },
+  accountType: { type: String, default: 'customer' }
+});
+
+const User = mongoose.model('User', UserSchema);
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
@@ -21,7 +29,7 @@ const generateToken = (user) => {
 };
 
 // User registration
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
 
@@ -33,14 +41,14 @@ router.post('/register', (req, res) => {
     }
 
     // Check if user already exists
-    const existingUser = users.find(user => user.email === email);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
     // Create new user
     const userId = `user_${Date.now()}`;
-    const newUser = {
+    const newUser = new User({
       _id: userId,
       email,
       password: password, // Save plain text password
@@ -48,18 +56,10 @@ router.post('/register', (req, res) => {
       lastName,
       createdAt: new Date().toISOString(),
       accountType: 'customer'
-    };
+    });
 
-    // Save to storage folder
-    const storageDir = path.join(__dirname, '../../storage/accounts');
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
-    }
-
-    const filePath = path.join(storageDir, `${userId}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(newUser, null, 2));
-
-    users.push(newUser);
+    // Save to MongoDB
+    await newUser.save();
     const token = generateToken(newUser);
 
     console.log(`User registered and saved: ${email}`);
@@ -85,7 +85,7 @@ router.post('/register', (req, res) => {
 });
 
 // User login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -97,7 +97,7 @@ router.post('/login', (req, res) => {
     }
 
     // Find user
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = await User.findOne({ email, password });
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -110,7 +110,7 @@ router.post('/login', (req, res) => {
       message: 'Login successful',
       token,
       user: {
-        id: user.id,
+        id: user._id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName
@@ -127,51 +127,47 @@ router.post('/login', (req, res) => {
 });
 
 // Get user deliveries
-router.get('/:email/deliveries', (req, res) => {
+router.get('/:email/deliveries', async (req, res) => {
   try {
     const { email } = req.params;
     
-    // Get or create delivery data for user
-    let deliveryData = userDeliveries.get(email);
-    
-    if (!deliveryData) {
-      // Create sample delivery data for demo
-      deliveryData = {
-        orderId: `ORD${Date.now()}`,
-        status: 'in_transit',
-        estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
-        trackingNumber: `TRK${Math.random().toString(36).substr(2, 12).toUpperCase()}`,
-        currentLocation: 'Distribution Center, New York',
-        updates: [
+    // For demo, return sample delivery data
+    const deliveryData = {
+      orderId: `ORD${Date.now()}`,
+      status: 'in_transit',
+      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      trackingNumber: `TRK${Math.random().toString(36).substr(2, 12).toUpperCase()}`,
+      currentLocation: 'Distribution Center, New York',
+      updates: [
+        {
+          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+          status: 'processing',
+          location: 'Warehouse',
+          description: 'Order received and processing started'
+        },
+        {
+          timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+          status: 'shipped',
+          location: 'Warehouse',
+          description: 'Package shipped from warehouse'
+        },
+        {
+          timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+          status: 'in_transit',
+          location: 'Distribution Center, New York',
+          description: 'Package arrived at distribution center'
+        }
+      ],
+      orderDetails: {
+        items: [
           {
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-            status: 'processing',
-            location: 'Warehouse',
-            description: 'Order received and processing started'
+            name: 'Elsa Fashion Designer Dress',
+            quantity: 1,
+            price: 299.99
           },
           {
-            timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-            status: 'shipped',
-            location: 'Warehouse',
-            description: 'Package shipped from warehouse'
-          },
-          {
-            timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
-            status: 'in_transit',
-            location: 'Distribution Center, New York',
-            description: 'Package arrived at distribution center'
-          }
-        ],
-        orderDetails: {
-          items: [
-            {
-              name: 'Elsa Fashion Designer Dress',
-              quantity: 1,
-              price: 299.99
-            },
-            {
-              name: 'Elsa Fashion Handbag',
-              quantity: 1,
+            name: 'Elsa Fashion Handbag',
+            quantity: 1,
               price: 149.99
             }
           ],
@@ -179,9 +175,6 @@ router.get('/:email/deliveries', (req, res) => {
           orderDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
         }
       };
-      
-      userDeliveries.set(email, deliveryData);
-    }
 
     res.json(deliveryData);
 
@@ -195,33 +188,19 @@ router.get('/:email/deliveries', (req, res) => {
 });
 
 // Update delivery status (for demo purposes)
-router.post('/:email/deliveries/update', (req, res) => {
+router.post('/:email/deliveries/update', async (req, res) => {
   try {
     const { email } = req.params;
     const { status, location, description } = req.body;
     
-    let deliveryData = userDeliveries.get(email);
-    if (!deliveryData) {
-      return res.status(404).json({ message: 'No delivery data found for user' });
-    }
-
-    // Add new update
-    deliveryData.updates.push({
-      timestamp: new Date().toISOString(),
-      status,
-      location,
-      description
-    });
-
-    // Update current status
-    deliveryData.status = status;
-    deliveryData.currentLocation = location;
-
+    // For demo, return success without actual storage
     console.log(`Delivery updated for ${email}: ${status}`);
 
     res.json({
       message: 'Delivery status updated successfully',
-      deliveryData
+      status,
+      location,
+      description
     });
 
   } catch (error) {
