@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CreditCard, ArrowLeft, CheckCircle } from 'lucide-react';
+import { CreditCard, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import * as cardValidator from 'card-validator';

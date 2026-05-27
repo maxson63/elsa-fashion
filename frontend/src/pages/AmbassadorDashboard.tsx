@@ -23,6 +23,7 @@ const AmbassadorDashboard: React.FC = () => {
       // Initialize selected outfits from ambassador data
       setSelectedOutfits(Array.isArray(ambassador?.selectedOutfits) ? ambassador.selectedOutfits : []);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ambassador]);
 
   const loadAllProducts = async () => {

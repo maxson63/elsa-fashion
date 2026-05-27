@@ -8,6 +8,7 @@ const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { cart } = useCart();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { ambassador, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

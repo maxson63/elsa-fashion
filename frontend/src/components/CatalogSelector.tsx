@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Check, X, Star } from 'lucide-react';
+import { Check, X, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface CatalogItem {
