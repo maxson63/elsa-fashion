@@ -2,25 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
-const mongoose = require('mongoose');
+const Ambassador = require('../models/Ambassador');
 const router = express.Router();
-
-// MongoDB Schema for Ambassador
-const AmbassadorSchema = new mongoose.Schema({
-  _id: String,
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  isVerified: { type: Boolean, default: false },
-  balance: { type: Number, default: 0 },
-  clearanceStatus: { type: String, default: 'pending' },
-  clearancePaymentStatus: { type: String, default: 'pending' },
-  profile: Object,
-  selectedOutfits: [{ type: String }],
-  createdAt: { type: String, default: () => new Date().toISOString() },
-  accountType: { type: String, default: 'ambassador' }
-});
-
-const Ambassador = mongoose.model('Ambassador', AmbassadorSchema);
 
 // Register ambassador
 router.post('/register', async (req, res) => {
