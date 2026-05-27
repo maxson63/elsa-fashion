@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Eye, EyeOff, Package, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Package, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const UserLogin: React.FC = () => {

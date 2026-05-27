@@ -141,6 +141,7 @@ const LocalPayment: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteStoredPayment = async (paymentId: string) => {
     // Delete functionality removed - payment details cannot be deleted
     toast.error('Payment details cannot be deleted for security reasons');

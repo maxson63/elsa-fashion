@@ -34,6 +34,7 @@ const DeliveryTracking: React.FC = () => {
 
   useEffect(() => {
     fetchDeliveryData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDeliveryData = async () => {
