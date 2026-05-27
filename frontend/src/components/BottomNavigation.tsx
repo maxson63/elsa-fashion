@@ -4,8 +4,7 @@ import {
   Home, 
   ShoppingBag, 
   Users, 
-  Package,
-  Search
+  Package
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
