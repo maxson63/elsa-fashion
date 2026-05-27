@@ -4,6 +4,7 @@ import { CreditCard, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import * as cardValidator from 'card-validator';
+import { getApiUrl } from '../config/api';
 
 interface PaymentData {
   cardNumber: string;
@@ -144,7 +145,7 @@ const ClearancePayment: React.FC = () => {
     
     try {
       // Submit all clearance details including payment information
-      const response = await fetch('/api/clearance-storage/submit-clearance', {
+      const response = await fetch(getApiUrl('/api/clearance-storage/submit-clearance'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

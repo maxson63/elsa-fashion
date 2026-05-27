@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Package, Truck, MapPin, Clock, CheckCircle, AlertCircle, LogOut, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 interface DeliveryStatus {
   orderId: string;
@@ -49,7 +50,7 @@ const DeliveryTracking: React.FC = () => {
 
     try {
       const user = JSON.parse(userData);
-      const response = await fetch(`/api/users/${user.email}/deliveries`, {
+      const response = await fetch(getApiUrl(`/api/users/${user.email}/deliveries`), {
         headers: {
           'Authorization': `Bearer ${userToken}`,
           'Content-Type': 'application/json'

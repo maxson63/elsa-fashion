@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { User, Gift, DollarSign, FileText, LogOut, Settings, ShoppingBag, Camera, Upload, RefreshCw, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 const AmbassadorDashboard: React.FC = () => {
   const { ambassador, logout } = useAuth();
@@ -28,7 +29,7 @@ const AmbassadorDashboard: React.FC = () => {
 
   const loadAllProducts = async () => {
     try {
-      const response = await fetch('/api/products');
+      const response = await fetch(getApiUrl('/api/products'));
       if (response.ok) {
         const products = await response.json();
         setAllProducts(products);
@@ -124,7 +125,7 @@ const AmbassadorDashboard: React.FC = () => {
     });
     
     try {
-      const response = await fetch('/api/ambassadors/update-outfits', {
+      const response = await fetch(getApiUrl('/api/ambassadors/update-outfits'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +174,7 @@ const AmbassadorDashboard: React.FC = () => {
   const loadClearanceSubmissions = async () => {
     try {
       console.log('Loading clearance submissions for ambassador:', ambassador?._id);
-      const response = await fetch(`/api/clearance-storage/submissions/${ambassador?._id}`);
+      const response = await fetch(getApiUrl(`/api/clearance-storage/submissions/${ambassador?._id}`));
       const data = await response.json();
       
       console.log('Clearance submissions response:', data);
@@ -193,7 +194,7 @@ const AmbassadorDashboard: React.FC = () => {
 
   const loadProfilePicture = async () => {
     try {
-      const response = await fetch(`/api/profile/${ambassador?._id}`);
+      const response = await fetch(getApiUrl(`/api/profile/${ambassador?._id}`));
       const data = await response.json();
       
       if (data.profilePicture) {
@@ -206,7 +207,7 @@ const AmbassadorDashboard: React.FC = () => {
 
   const saveProfilePicture = async (pictureData: string) => {
     try {
-      const response = await fetch('/api/profile/upload', {
+      const response = await fetch(getApiUrl('/api/profile/upload'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -232,7 +233,7 @@ const AmbassadorDashboard: React.FC = () => {
 
   const deleteProfilePicture = async () => {
     try {
-      const response = await fetch(`/api/profile/${ambassador?._id}`, {
+      const response = await fetch(getApiUrl(`/api/profile/${ambassador?._id}`), {
         method: 'DELETE'
       });
 

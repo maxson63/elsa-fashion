@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Upload, ArrowRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 const ClearanceForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -61,7 +62,7 @@ const ClearanceForm: React.FC = () => {
           uploadFormData.append('idDocument', file);
           uploadFormData.append('ambassadorId', ambassador?._id || 'temp_ambassador');
           
-          const response = await fetch('/api/clearance-storage/upload-id-document', {
+          const response = await fetch(getApiUrl('/api/clearance-storage/upload-id-document'), {
             method: 'POST',
             body: uploadFormData
           });

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { getApiUrl } from '../config/api';
 
 interface Ambassador {
   _id: string;
@@ -41,7 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/ambassadors/login', {
+      const response = await fetch(getApiUrl('/api/ambassadors/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,10 +68,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (email: string, password: string) => {
     try {
       console.log('Attempting to register:', email);
-      console.log('Backend URL: /api/ambassadors/register');
+      console.log('Backend URL:', getApiUrl('/api/ambassadors/register'));
       
       // Test connection first
-      const testResponse = await fetch('/api/ambassadors/register', {
+      const testResponse = await fetch(getApiUrl('/api/ambassadors/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

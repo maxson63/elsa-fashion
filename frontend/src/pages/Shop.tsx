@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, Plus } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 interface Product {
   _id: string;
@@ -30,7 +31,7 @@ const Shop: React.FC = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/products');
+        const response = await fetch(getApiUrl('/api/products'));
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

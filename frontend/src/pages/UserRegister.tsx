@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 const UserRegister: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ const UserRegister: React.FC = () => {
     try {
       console.log('Attempting user registration:', formData.email);
       
-      const response = await fetch('/api/users/register', {
+      const response = await fetch(getApiUrl('/api/users/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

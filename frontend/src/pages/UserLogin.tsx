@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Package, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 const UserLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ const UserLogin: React.FC = () => {
     try {
       console.log('Attempting user login:', formData.email);
       
-      const response = await fetch('/api/users/login', {
+      const response = await fetch(getApiUrl('/api/users/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

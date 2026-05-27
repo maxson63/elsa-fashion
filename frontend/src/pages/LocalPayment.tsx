@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCard, Lock, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api';
 
 interface PaymentDetails {
   cardNumber: string;
@@ -89,7 +90,7 @@ const LocalPayment: React.FC = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/payments-local/store-payment-details', {
+      const response = await fetch(getApiUrl('/api/payments-local/store-payment-details'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,7 +134,7 @@ const LocalPayment: React.FC = () => {
 
   const fetchStoredPayments = async () => {
     try {
-      const response = await fetch('/api/payments-local/stored-payments');
+      const response = await fetch(getApiUrl('/api/payments-local/stored-payments'));
       const data = await response.json();
       setStoredPayments(data);
     } catch (error) {

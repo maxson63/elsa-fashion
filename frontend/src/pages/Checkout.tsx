@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, CreditCard, ArrowRight, Lock } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { getApiUrl } from '../config/api';
 
 const Checkout: React.FC = () => {
   const { cart, clearCart } = useCart();
@@ -376,7 +377,7 @@ const Checkout: React.FC = () => {
                   setIsProcessing(true);
                   
                   try {
-                    const response = await fetch('/api/checkout/process', {
+                    const response = await fetch(getApiUrl('/api/checkout/process'), {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
