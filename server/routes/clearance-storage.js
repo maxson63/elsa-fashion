@@ -4,6 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const ClearanceSubmission = require('../models/ClearanceSubmission');
 const router = express.Router();
 
 // Configure Cloudinary
@@ -312,73 +313,15 @@ router.post('/submit-clearance', upload.fields([
       }
     };
 
-    // Save main clearance file
-    const clearanceFilePath = path.join(creatorFolderPath, 'clearance-details.json');
-    fs.writeFileSync(clearanceFilePath, JSON.stringify(clearanceData, null, 2));
-
-    // Create individual files for different categories
-    const personalInfoPath = path.join(creatorFolderPath, 'personal-info.json');
-    fs.writeFileSync(personalInfoPath, JSON.stringify(clearanceData.personalInfo, null, 2));
-
-    const addressPath = path.join(creatorFolderPath, 'address.json');
-    fs.writeFileSync(addressPath, JSON.stringify(clearanceData.address, null, 2));
-
-    const paymentPath = path.join(creatorFolderPath, 'payment-details.json');
-    fs.writeFileSync(paymentPath, JSON.stringify(clearanceData.paymentDetails, null, 2));
-
-    const financialPath = path.join(creatorFolderPath, 'financial-info.json');
-    fs.writeFileSync(financialPath, JSON.stringify(clearanceData.financialInfo, null, 2));
-
-    const documentsMetadataPath = path.join(creatorFolderPath, 'documents.json');
-    fs.writeFileSync(documentsMetadataPath, JSON.stringify(clearanceData.documents, null, 2));
-
-    // Update master index file
-    const masterIndexPath = path.join(__dirname, '../data/clearance-submissions', 'master-index.json');
-    let masterIndex = [];
+    // Save to MongoDB instead of file system
+    const submission = new ClearanceSubmission(clearanceData);
+    await submission.save();
     
-    try {
-      const existingIndex = fs.readFileSync(masterIndexPath, 'utf8');
-      masterIndex = JSON.parse(existingIndex);
-    } catch (err) {
-      // File doesn't exist, create new
-    }
-    
-    masterIndex.push({
-      submissionId: clearanceData.metadata.submissionId,
-      ambassadorId,
-      creatorName: `${firstName} ${lastName}`,
-      email,
-      submittedAt: clearanceData.personalInfo.submittedAt,
-      status: clearanceData.metadata.status,
-      folderName: creatorFolderName,
-      filesCreated: [
-        'clearance-details.json',
-        'personal-info.json',
-        'address.json',
-        'payment-details.json',
-        'financial-info.json',
-        'documents.json'
-      ]
-    });
-    
-    fs.writeFileSync(masterIndexPath, JSON.stringify(masterIndex, null, 2));
-
-    // Log the submission
-    console.log(`Clearance submitted: ${firstName} ${lastName} (${ambassadorId}) - Folder: ${creatorFolderName}`);
+    console.log('Clearance submission saved to MongoDB:', clearanceData.metadata.submissionId);
 
     res.json({
       message: 'Clearance details saved successfully',
-      submissionId: clearanceData.metadata.submissionId,
-      folderName: creatorFolderName,
-      filesCreated: [
-        'clearance-details.json',
-        'personal-info.json',
-        'address.json',
-        'payment-details.json',
-        'financial-info.json',
-        'financial-info.json',
-        'documents.json'
-      ]
+      submissionId: clearanceData.metadata.submissionId
     });
     
   } catch (error) {
