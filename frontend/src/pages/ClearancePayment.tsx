@@ -89,7 +89,7 @@ const ClearancePayment: React.FC = () => {
       const year = parseInt(paymentData.expiryYear);
       
       // Basic validation first
-      if (isNaN(month) || isNaN(year) || month < 1 || month > 12 || year < 2024 || year > 2050) {
+      if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
         toast.error('Invalid expiry date. Please check and try again.');
         return false;
       }
