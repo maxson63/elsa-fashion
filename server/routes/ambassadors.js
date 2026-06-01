@@ -22,9 +22,7 @@ router.post('/register', async (req, res) => {
     }
     
     // Create ambassador object
-    const ambassadorId = `amb_${Date.now()}`;
     const ambassador = new Ambassador({
-      _id: ambassadorId,
       email,
       password: password,
       isVerified: false,
