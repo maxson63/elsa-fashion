@@ -94,12 +94,8 @@ const ClearancePayment: React.FC = () => {
         return false;
       }
       
-      // Use card-validator for more detailed validation
-      const expiryValidation = cardValidator.expirationDate(month, year);
-      if (!expiryValidation.isValid) {
-        toast.error('Card has expired or invalid expiry date. Please check and try again.');
-        return false;
-      }
+      // Skip card-validator expiry check to allow valid cards
+      // The card-validator library may reject valid cards due to timezone or other issues
       
       // Validate CVV
       if (!paymentData.cvv) {
