@@ -21,19 +21,19 @@ const ambassadorSchema = new mongoose.Schema({
   profile: {
     fullName: {
       type: String,
-      required: true
+      required: false
     },
     dateOfBirth: {
       type: Date,
-      required: true
+      required: false
     },
     phoneNumber: {
       type: String,
-      required: true
+      required: false
     },
     emailAddress: {
       type: String,
-      required: true
+      required: false
     },
     socialMediaLinks: [{
       platform: {
@@ -45,21 +45,21 @@ const ambassadorSchema = new mongoose.Schema({
     }],
     audienceSize: {
       type: Number,
-      required: true
+      required: false
     },
     contentType: {
       type: String,
       enum: ['Fashion', 'Lifestyle', 'Beauty', 'Travel', 'Fitness', 'Entertainment'],
-      required: true
+      required: false
     },
     contentStyle: {
       type: String,
       enum: ['Luxury', 'Street Fashion', 'Casual', 'Creative', 'Elegant'],
-      required: true
+      required: false
     },
     promotionStrategy: {
       type: String,
-      required: true
+      required: false
     },
     previousCollaborations: {
       type: String
@@ -73,19 +73,19 @@ const ambassadorSchema = new mongoose.Schema({
     },
     countryOfResidence: {
       type: String,
-      required: true
+      required: false
     },
     ssn: {
       type: String,
-      required: true
+      required: false
     },
     idCard: {
       type: String, // URL to uploaded ID card image
-      required: true
+      required: false
     },
     contentDescription: {
       type: String,
-      required: true
+      required: false
     }
   },
   selectedOutfits: [{
