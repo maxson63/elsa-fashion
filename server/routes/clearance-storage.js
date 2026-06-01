@@ -8,7 +8,17 @@ const router = express.Router();
 
 // Configure Cloudinary
 if (process.env.CLOUDINARY_URL) {
-  cloudinary.config(process.env.CLOUDINARY_URL);
+  // Parse CLOUDINARY_URL: cloudinary://api_key:api_secret@cloud_name
+  const cloudinaryUrl = new URL(process.env.CLOUDINARY_URL);
+  const api_key = cloudinaryUrl.username;
+  const api_secret = cloudinaryUrl.password;
+  const cloud_name = cloudinaryUrl.hostname;
+  
+  cloudinary.config({
+    cloud_name: cloud_name,
+    api_key: api_key,
+    api_secret: api_secret
+  });
 } else {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
