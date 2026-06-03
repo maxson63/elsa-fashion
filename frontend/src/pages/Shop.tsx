@@ -71,13 +71,13 @@ const Shop: React.FC = () => {
     ? products 
     : products.filter(product => {
         if (selectedCategory === 'Clothing') {
-          return product.category.includes('Evening Wear') || product.category.includes('Fashion') || product.category.includes('Luxury');
+          return ['casual', 'formal', 'street', 'luxury', 'creative'].includes(product.category);
         } else if (selectedCategory === 'Accessories') {
           return product.category.includes('Accessories');
         } else if (selectedCategory === 'Shoes') {
           return product.category.includes('Footwear') || product.category.includes('Shoes');
         } else if (selectedCategory === 'Bags') {
-          return product.category.includes('Bags') || product.category.includes('Handbag');
+          return product.category === 'bags';
         }
         return false;
       });
