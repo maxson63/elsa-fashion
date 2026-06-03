@@ -62,6 +62,25 @@ router.post('/bulk', async (req, res) => {
   }
 });
 
+// Update category for multiple products (admin only)
+router.post('/update-category', async (req, res) => {
+  try {
+    const { productNames, newCategory } = req.body;
+    
+    const result = await Product.updateMany(
+      { name: { $in: productNames } },
+      { category: newCategory }
+    );
+    
+    res.json({ 
+      message: `Successfully updated ${result.modifiedCount} products to category: ${newCategory}`,
+      modifiedCount: result.modifiedCount
+    });
+  } catch (error) {
+    res.status(400).json({ message: 'Error updating product categories', error: error.message });
+  }
+});
+
 // Update product (admin only)
 router.put('/:id', async (req, res) => {
   try {

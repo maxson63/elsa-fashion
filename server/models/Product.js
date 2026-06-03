@@ -22,7 +22,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['casual', 'formal', 'street', 'luxury', 'creative']
+    enum: ['casual', 'formal', 'street', 'luxury', 'creative', 'bags']
   },
   sizes: [{
     type: String,
