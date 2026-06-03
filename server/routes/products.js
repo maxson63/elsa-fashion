@@ -1,25 +1,24 @@
 const express = require('express');
+const Product = require('../models/Product');
 const router = express.Router();
-
-// Mock products data to replace MongoDB dependency
-const mockProducts = [];
 
 // Get all products
 router.get('/', async (req, res) => {
   try {
     console.log('Fetching products with query:', req.query);
     const { category, featured } = req.query;
-    let filteredProducts = [...mockProducts];
+    let query = {};
     
     if (category) {
-      filteredProducts = filteredProducts.filter(product => product.category === category);
+      query.category = category;
     }
     if (featured === 'true') {
-      filteredProducts = filteredProducts.filter(product => product.featured === true);
+      query.featured = true;
     }
     
-    console.log('Products found:', filteredProducts.length);
-    res.json(filteredProducts);
+    const products = await Product.find(query);
+    console.log('Products found:', products.length);
+    res.json(products);
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Error fetching products', error: error.message });
@@ -47,6 +46,19 @@ router.post('/', async (req, res) => {
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ message: 'Error creating product', error: error.message });
+  }
+});
+
+// Bulk insert products (admin only)
+router.post('/bulk', async (req, res) => {
+  try {
+    const products = await Product.insertMany(req.body);
+    res.status(201).json({ 
+      message: `Successfully added ${products.length} products`,
+      products 
+    });
+  } catch (error) {
+    res.status(400).json({ message: 'Error creating products', error: error.message });
   }
 });
 
