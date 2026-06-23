@@ -40,12 +40,13 @@ const AmbassadorDashboard: React.FC = () => {
   };
 
   const handleOutfitSelection = (product: any) => {
-    // Check if outfit is already selected
-    const isSelected = selectedOutfits.some((outfit: any) => outfit.id === product.id);
+    // Check if outfit is already selected (use _id for MongoDB or id as fallback)
+    const productId = product._id || product.id;
+    const isSelected = selectedOutfits.some((outfit: any) => (outfit._id || outfit.id) === productId);
     
     if (isSelected) {
       // Remove from selection with feedback
-      setSelectedOutfits(selectedOutfits.filter((outfit: any) => outfit.id !== product.id));
+      setSelectedOutfits(selectedOutfits.filter((outfit: any) => (outfit._id || outfit.id) !== productId));
       toast.success(`${product.name} removed from selection`, {
         icon: '🗑️'
       });
@@ -109,7 +110,7 @@ const AmbassadorDashboard: React.FC = () => {
     
     // Ensure selectedOutfits is always an array of proper outfit objects
     const outfitsToSend = Array.isArray(selectedOutfits) ? selectedOutfits.map(outfit => ({
-      id: outfit.id,
+      id: outfit._id || outfit.id,
       name: outfit.name,
       price: outfit.price,
       image: outfit.image,
@@ -739,9 +740,10 @@ const AmbassadorDashboard: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-3 sm:p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                 {allProducts.map((product: any) => {
-                  const isSelected = selectedOutfits.some((outfit: any) => outfit.id === product.id);
+                  const productId = product._id || product.id;
+                  const isSelected = selectedOutfits.some((outfit: any) => (outfit._id || outfit.id) === productId);
                   return (
-                    <div key={product.id} className={`bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-xl transform hover:scale-105 ${
+                    <div key={productId} className={`bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-xl transform hover:scale-105 ${
                       isSelected ? 'border-purple-600 shadow-lg ring-2 ring-purple-200' : 'border-gray-200 hover:border-purple-300'
                     }`}>
                       {/* Product Image - Mobile Optimized */}

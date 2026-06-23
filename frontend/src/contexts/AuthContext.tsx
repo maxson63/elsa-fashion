@@ -17,6 +17,7 @@ interface AuthContextType {
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
+  setAuthState: (token: string, ambassador: Ambassador) => void;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -117,6 +118,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('ambassador');
   };
 
+  const setAuthState = (newToken: string, newAmbassador: Ambassador) => {
+    setToken(newToken);
+    setAmbassador(newAmbassador);
+    localStorage.setItem('ambassadorToken', newToken);
+    localStorage.setItem('ambassador', JSON.stringify(newAmbassador));
+  };
+
   const isAuthenticated = !!token && !!ambassador;
 
   return (
@@ -126,6 +134,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         token,
         login,
         register,
+        setAuthState,
         logout,
         isAuthenticated,
         loading,

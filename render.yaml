@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: elsa-fashion-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/index.js
+    envVars:
+      - key: MONGODB_URI
+        fromDatabase:
+          name: elsa-fashion-mongodb
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000

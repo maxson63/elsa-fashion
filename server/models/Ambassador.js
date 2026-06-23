@@ -18,6 +18,28 @@ const ambassadorSchema = new mongoose.Schema({
   twoFactorSecret: {
     type: String
   },
+  phoneNumber: {
+    type: String
+  },
+  phoneVerification: {
+    code: {
+      type: String
+    },
+    codeExpiresAt: {
+      type: Date
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    verifiedAt: {
+      type: Date
+    },
+    attempts: {
+      type: Number,
+      default: 0
+    }
+  },
   profile: {
     fullName: {
       type: String
