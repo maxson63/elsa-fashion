@@ -19,9 +19,11 @@ const AmbassadorRegister: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ambassadorId, setAmbassadorId] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [checksum, setChecksum] = useState('');
   const [codeExpiresIn, setCodeExpiresIn] = useState('');
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { register } = useAuth();
   const navigate = useNavigate();
 
