@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const Ambassador = require('../models/Ambassador');
+const fs = require('fs');
+const path = require('path');
 const router = express.Router();
 
 // Register ambassador - Step 1: Initial registration with email/password
@@ -100,22 +102,54 @@ router.post('/send-verification-code', async (req, res) => {
     // Calculate checksum for mathematical validation
     const checksum = calculateChecksum(verificationCode);
     
-    // Store verification data (with MongoDB fallback)
+    // Save to MongoDB first
+    console.log('Attempting to save to MongoDB for ambassador:', ambassadorId);
     try {
       if (ambassador.save) {
         ambassador.phoneNumber = phoneNumber;
         ambassador.phoneVerification = {
           code: verificationCode,
-          codeExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes expiry
+          codeExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
           isVerified: false,
           verifiedAt: null,
           attempts: 0
         };
+        console.log('Ambassador object before save:', JSON.stringify({
+          _id: ambassador._id,
+          email: ambassador.email,
+          phoneNumber: ambassador.phoneNumber,
+          hasPhoneVerification: !!ambassador.phoneVerification
+        }));
         await ambassador.save();
+        console.log(`✅ Successfully saved ambassador data to MongoDB: ${ambassadorId}`);
+      } else {
+        console.log('⚠️ Ambassador object has no save method, skipping MongoDB save');
       }
     } catch (dbError) {
-      console.log('MongoDB save error, using in-memory fallback');
+      console.error('❌ MongoDB save error:', dbError.message);
+      console.error('Full error:', dbError);
     }
+    
+    // Also save to local storage file as backup
+    const storageDir = path.join(__dirname, '../../storage/ambassadors');
+    if (!fs.existsSync(storageDir)) {
+      fs.mkdirSync(storageDir, { recursive: true });
+    }
+    
+    const ambassadorFile = path.join(storageDir, `amb_${ambassadorId}.json`);
+    const ambassadorData = {
+      ambassadorId: ambassadorId,
+      email: ambassador.email,
+      phoneNumber: phoneNumber,
+      verificationCode: verificationCode,
+      checksum: checksum,
+      codeExpiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+      isVerified: false,
+      createdAt: new Date().toISOString()
+    };
+    
+    fs.writeFileSync(ambassadorFile, JSON.stringify(ambassadorData, null, 2));
+    console.log(`Saved ambassador data to local storage: ${ambassadorFile}`);
     
     // Send SMS (mock implementation - replace with actual SMS service like Twilio)
     const smsSent = await sendVerificationSMS(phoneNumber, verificationCode);
