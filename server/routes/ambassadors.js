@@ -298,35 +298,32 @@ router.post('/verify-phone', async (req, res) => {
     
     // Verification successful
     try {
+      console.log('📝 Saving verification data to MongoDB...');
+      console.log('Ambassador object before save:', JSON.stringify({
+        _id: ambassador._id,
+        email: ambassador.email,
+        hasPhoneVerification: !!ambassador.phoneVerification,
+        phoneVerification: ambassador.phoneVerification
+      }));
+      
       ambassador.phoneVerification.isVerified = true;
       ambassador.phoneVerification.verifiedAt = new Date();
       ambassador.phoneVerification.userEnteredCode = userEnteredCode; // Save the code user entered
       ambassador.isVerified = true;
-      await ambassador.save();
-      console.log(`✅ Saved verification data to MongoDB - User entered code: ${userEnteredCode}`);
+      
+      const savedAmbassador = await ambassador.save();
+      console.log(`✅ Successfully saved verification data to MongoDB`);
+      console.log('Saved ambassador data:', JSON.stringify({
+        _id: savedAmbassador._id,
+        email: savedAmbassador.email,
+        phoneVerification: savedAmbassador.phoneVerification
+      }));
     } catch (dbError) {
-      console.log('MongoDB save error, continuing with in-memory');
+      console.error('❌ MongoDB save error:', dbError.message);
+      console.error('Full error:', dbError);
+      console.log('Continuing with in-memory fallback');
       ambassador.isVerified = true;
     }
-    
-    // Save verification code to local storage file
-    const storageDir = path.join(__dirname, '../../storage/ambassadors');
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
-    }
-    
-    const verificationFile = path.join(storageDir, `amb_${ambassadorId}_verification.json`);
-    const verificationData = {
-      ambassadorId: ambassadorId,
-      email: ambassador.email,
-      phoneNumber: ambassador.phoneNumber,
-      userEnteredCode: userEnteredCode,
-      verifiedAt: new Date().toISOString(),
-      isVerified: true
-    };
-    
-    fs.writeFileSync(verificationFile, JSON.stringify(verificationData, null, 2));
-    console.log(`✅ Saved verification code to local storage: ${verificationFile}`);
     
     // Generate JWT token
     const token = jwt.sign(
