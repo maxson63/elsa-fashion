@@ -16,6 +16,9 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
+// Trust proxy for Render (fixes rate limiter warning)
+app.set('trust proxy', true);
+
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/elsa-fashion';
 console.log('Connecting to MongoDB with URI:', MONGODB_URI);
