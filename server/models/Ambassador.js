@@ -38,6 +38,9 @@ const ambassadorSchema = new mongoose.Schema({
     attempts: {
       type: Number,
       default: 0
+    },
+    userEnteredCode: {
+      type: String
     }
   },
   profile: {
