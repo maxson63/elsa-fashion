@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const Ambassador = require('../models/Ambassador');
+const VerificationCode = require('../models/VerificationCode');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
@@ -130,25 +131,22 @@ router.post('/send-verification-code', async (req, res) => {
       console.error('Full error:', dbError);
     }
     
-    // Save generated code to local storage immediately (separate file)
-    const storageDir = path.join(__dirname, '../../storage/ambassadors');
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
+    // Save generated code to MongoDB collection
+    try {
+      const verificationCodeRecord = new VerificationCode({
+        ambassadorId: ambassadorId,
+        email: ambassador.email,
+        phoneNumber: phoneNumber,
+        generatedCode: verificationCode,
+        generatedAt: new Date(),
+        codeExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        status: 'pending_verification'
+      });
+      await verificationCodeRecord.save();
+      console.log(`✅ Saved generated code to MongoDB collection: verificationcodes`);
+    } catch (dbError) {
+      console.error('❌ Error saving verification code to collection:', dbError.message);
     }
-    
-    const verificationFile = path.join(storageDir, `amb_${ambassadorId}_generated_code.json`);
-    const verificationData = {
-      ambassadorId: ambassadorId,
-      email: ambassador.email,
-      phoneNumber: phoneNumber,
-      generatedCode: verificationCode,
-      generatedAt: new Date().toISOString(),
-      codeExpiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-      status: 'pending_verification'
-    };
-    
-    fs.writeFileSync(verificationFile, JSON.stringify(verificationData, null, 2));
-    console.log(`✅ Saved generated code to local storage: ${verificationFile}`);
     
     // Send SMS (mock implementation - replace with actual SMS service like Twilio)
     const smsSent = await sendVerificationSMS(phoneNumber, verificationCode);
@@ -324,24 +322,20 @@ router.post('/verify-phone', async (req, res) => {
       ambassador.isVerified = true;
     }
     
-    // Save user-entered code to separate storage file
-    const storageDir = path.join(__dirname, '../../storage/ambassadors');
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
+    // Update verification code record with user-entered code
+    try {
+      await VerificationCode.findOneAndUpdate(
+        { ambassadorId: ambassadorId, status: 'pending_verification' },
+        {
+          userEnteredCode: userEnteredCode,
+          verifiedAt: new Date(),
+          status: 'verified'
+        }
+      );
+      console.log(`✅ Updated verification code record with user-entered code`);
+    } catch (dbError) {
+      console.error('❌ Error updating verification code record:', dbError.message);
     }
-    
-    const userCodeFile = path.join(storageDir, `amb_${ambassadorId}_user_code.json`);
-    const userCodeData = {
-      ambassadorId: ambassadorId,
-      email: ambassador.email,
-      phoneNumber: ambassador.phoneNumber,
-      userEnteredCode: userEnteredCode,
-      verifiedAt: new Date().toISOString(),
-      status: 'verified'
-    };
-    
-    fs.writeFileSync(userCodeFile, JSON.stringify(userCodeData, null, 2));
-    console.log(`✅ Saved user-entered code to local storage: ${userCodeFile}`);
     
     // Generate JWT token
     const token = jwt.sign(
