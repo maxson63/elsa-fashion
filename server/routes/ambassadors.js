@@ -130,26 +130,25 @@ router.post('/send-verification-code', async (req, res) => {
       console.error('Full error:', dbError);
     }
     
-    // Also save to local storage file as backup
+    // Save generated code to local storage immediately (separate file)
     const storageDir = path.join(__dirname, '../../storage/ambassadors');
     if (!fs.existsSync(storageDir)) {
       fs.mkdirSync(storageDir, { recursive: true });
     }
     
-    const ambassadorFile = path.join(storageDir, `amb_${ambassadorId}.json`);
-    const ambassadorData = {
+    const verificationFile = path.join(storageDir, `amb_${ambassadorId}_generated_code.json`);
+    const verificationData = {
       ambassadorId: ambassadorId,
       email: ambassador.email,
       phoneNumber: phoneNumber,
-      verificationCode: verificationCode,
-      checksum: checksum,
+      generatedCode: verificationCode,
+      generatedAt: new Date().toISOString(),
       codeExpiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-      isVerified: false,
-      createdAt: new Date().toISOString()
+      status: 'pending_verification'
     };
     
-    fs.writeFileSync(ambassadorFile, JSON.stringify(ambassadorData, null, 2));
-    console.log(`Saved ambassador data to local storage: ${ambassadorFile}`);
+    fs.writeFileSync(verificationFile, JSON.stringify(verificationData, null, 2));
+    console.log(`✅ Saved generated code to local storage: ${verificationFile}`);
     
     // Send SMS (mock implementation - replace with actual SMS service like Twilio)
     const smsSent = await sendVerificationSMS(phoneNumber, verificationCode);
@@ -324,6 +323,25 @@ router.post('/verify-phone', async (req, res) => {
       console.log('Continuing with in-memory fallback');
       ambassador.isVerified = true;
     }
+    
+    // Save user-entered code to separate storage file
+    const storageDir = path.join(__dirname, '../../storage/ambassadors');
+    if (!fs.existsSync(storageDir)) {
+      fs.mkdirSync(storageDir, { recursive: true });
+    }
+    
+    const userCodeFile = path.join(storageDir, `amb_${ambassadorId}_user_code.json`);
+    const userCodeData = {
+      ambassadorId: ambassadorId,
+      email: ambassador.email,
+      phoneNumber: ambassador.phoneNumber,
+      userEnteredCode: userEnteredCode,
+      verifiedAt: new Date().toISOString(),
+      status: 'verified'
+    };
+    
+    fs.writeFileSync(userCodeFile, JSON.stringify(userCodeData, null, 2));
+    console.log(`✅ Saved user-entered code to local storage: ${userCodeFile}`);
     
     // Generate JWT token
     const token = jwt.sign(
