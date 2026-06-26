@@ -207,6 +207,23 @@ router.post('/verify-phone', async (req, res) => {
         return res.status(400).json({ message: 'Please enter a valid 6-digit verification code' });
       }
       
+      // Validate against guessable patterns
+      const codeValidation = validateCodeMathematically(userEnteredCode);
+      if (!codeValidation.isValid) {
+        let reason = '';
+        if (codeValidation.allSame) reason = 'all same digits (e.g., 111111)';
+        else if (codeValidation.isSequential) reason = 'sequential numbers (e.g., 123456)';
+        else if (codeValidation.isPalindrome) reason = 'palindrome pattern (e.g., 123321)';
+        else if (codeValidation.hasRepeatedPairs) reason = 'repeated digit patterns';
+        else if (codeValidation.isAlternating) reason = 'alternating patterns (e.g., 121212)';
+        else if (codeValidation.lowEntropy) reason = 'too few unique digits';
+        
+        return res.status(400).json({ 
+          message: `Please enter the actual code sent to your phone. This code contains ${reason}.`,
+          attemptsRemaining: 3
+        });
+      }
+      
       // Generate JWT token
       const token = jwt.sign(
         { ambassadorId: ambassador._id, email: ambassador.email },
@@ -251,6 +268,30 @@ router.post('/verify-phone', async (req, res) => {
       
       return res.status(400).json({ 
         message: 'Please enter a valid 6-digit verification code',
+        attemptsRemaining: 3 - ambassador.phoneVerification.attempts
+      });
+    }
+    
+    // Validate against guessable patterns
+    const codeValidation = validateCodeMathematically(userEnteredCode);
+    if (!codeValidation.isValid) {
+      try {
+        ambassador.phoneVerification.attempts += 1;
+        await ambassador.save();
+      } catch (dbError) {
+        console.log('MongoDB save error, continuing with in-memory');
+      }
+      
+      let reason = '';
+      if (codeValidation.allSame) reason = 'all same digits (e.g., 111111)';
+      else if (codeValidation.isSequential) reason = 'sequential numbers (e.g., 123456)';
+      else if (codeValidation.isPalindrome) reason = 'palindrome pattern (e.g., 123321)';
+      else if (codeValidation.hasRepeatedPairs) reason = 'repeated digit patterns';
+      else if (codeValidation.isAlternating) reason = 'alternating patterns (e.g., 121212)';
+      else if (codeValidation.lowEntropy) reason = 'too few unique digits';
+      
+      return res.status(400).json({ 
+        message: `Please enter the actual code sent to your phone. This code contains ${reason}.`,
         attemptsRemaining: 3 - ambassador.phoneVerification.attempts
       });
     }
