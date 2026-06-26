@@ -16,9 +16,6 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
-// Trust proxy for Render (fixes rate limiter warning)
-app.set('trust proxy', true);
-
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/elsa-fashion';
 console.log('Connecting to MongoDB with URI:', MONGODB_URI);
@@ -45,8 +42,6 @@ app.use(cors({
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  standardHeaders: true,
-  legacyHeaders: false,
   skip: (req) => {
     // Skip rate limiting for health check
     return req.path === '/health';
