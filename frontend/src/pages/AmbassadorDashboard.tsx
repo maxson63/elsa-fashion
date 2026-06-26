@@ -184,9 +184,15 @@ const AmbassadorDashboard: React.FC = () => {
   };
 
   const loadClearanceSubmissions = async () => {
+    if (!ambassador?._id) {
+      console.log('Ambassador ID not available, skipping clearance submissions load');
+      setClearanceSubmissions([]);
+      return;
+    }
+    
     try {
-      console.log('Loading clearance submissions for ambassador:', ambassador?._id);
-      const response = await fetch(getApiUrl(`/api/clearance-storage/submissions/${ambassador?._id}`));
+      console.log('Loading clearance submissions for ambassador:', ambassador._id);
+      const response = await fetch(getApiUrl(`/api/clearance-storage/submissions/${ambassador._id}`));
       const data = await response.json();
       
       console.log('Clearance submissions response:', data);
@@ -205,8 +211,13 @@ const AmbassadorDashboard: React.FC = () => {
   };
 
   const loadProfilePicture = async () => {
+    if (!ambassador?._id) {
+      console.log('Ambassador ID not available, skipping profile picture load');
+      return;
+    }
+    
     try {
-      const response = await fetch(getApiUrl(`/api/profile/${ambassador?._id}`));
+      const response = await fetch(getApiUrl(`/api/profile/${ambassador._id}`));
       const data = await response.json();
       
       if (data.profilePicture) {
