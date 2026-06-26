@@ -174,8 +174,8 @@ router.post('/verify-phone', async (req, res) => {
   try {
     const { ambassadorId, code, userEnteredCode } = req.body;
     
-    if (!ambassadorId || !code || !userEnteredCode) {
-      return res.status(400).json({ message: 'Ambassador ID, code, and user entered code are required' });
+    if (!ambassadorId || !userEnteredCode) {
+      return res.status(400).json({ message: 'Ambassador ID and verification code are required' });
     }
     
     // Find ambassador (with MongoDB fallback)
@@ -198,28 +198,15 @@ router.post('/verify-phone', async (req, res) => {
       return res.status(404).json({ message: 'Ambassador not found' });
     }
     
-    // For mock mode, still validate the code mathematically
-    if (!ambassador.phoneVerification) {
-      console.log('Using mock verification mode with mathematical validation');
+    // For mock mode (no phoneVerification data), accept any 6-digit code
+    if (!ambassador.phoneVerification || !ambassador.phoneVerification.code) {
+      console.log('Using mock verification mode - accepting any 6-digit code');
       
-      // Validate user entered code mathematically
-      const userCodeValidation = validateCodeMathematically(userEnteredCode);
-      
-      // Reject common patterns even in mock mode
-      if (!userCodeValidation.isValid) {
-        let reason = '';
-        if (userCodeValidation.isSequential) reason = 'sequential numbers';
-        else if (userCodeValidation.allSame) reason = 'all same digits';
-        else if (userCodeValidation.isPalindrome) reason = 'palindrome pattern';
-        
-        console.log(`Rejected code ${userEnteredCode}: contains ${reason}`);
-        return res.status(400).json({ 
-          message: `Code validation failed. Code contains ${reason}. Please enter the actual code sent to your phone.`,
-          attemptsRemaining: 3
-        });
+      // Check if user entered a valid 6-digit code
+      if (userEnteredCode.length !== 6 || !/^\d+$/.test(userEnteredCode)) {
+        return res.status(400).json({ message: 'Please enter a valid 6-digit verification code' });
       }
       
-      // For mock mode, accept any valid-looking code (not common patterns)
       // Generate JWT token
       const token = jwt.sign(
         { ambassadorId: ambassador._id, email: ambassador.email },
@@ -227,7 +214,7 @@ router.post('/verify-phone', async (req, res) => {
         { expiresIn: '24h' }
       );
       
-      console.log(`Phone verified for ${ambassador.email}. Code: ${code}, User entered: ${userEnteredCode}`);
+      console.log(`Phone verified for ${ambassador.email}. User entered code: ${userEnteredCode}`);
       
       return res.json({
         message: 'Phone verified successfully',
@@ -243,11 +230,6 @@ router.post('/verify-phone', async (req, res) => {
       });
     }
     
-    // Check if verification data exists
-    if (!ambassador.phoneVerification || !ambassador.phoneVerification.code) {
-      return res.status(400).json({ message: 'No verification code sent. Please request a new code.' });
-    }
-    
     // Check if code expired
     if (new Date() > ambassador.phoneVerification.codeExpiresAt) {
       return res.status(400).json({ message: 'Verification code has expired. Please request a new code.' });
@@ -258,12 +240,8 @@ router.post('/verify-phone', async (req, res) => {
       return res.status(400).json({ message: 'Maximum attempts reached. Please request a new code.' });
     }
     
-    // Enhanced mathematical validation
-    const expectedCodeValidation = validateCodeMathematically(ambassador.phoneVerification.code);
-    const userCodeValidation = validateCodeMathematically(userEnteredCode);
-    
-    // Validate codes match exactly
-    if (code !== userEnteredCode) {
+    // Simple validation: check if codes match exactly
+    if (ambassador.phoneVerification.code !== userEnteredCode) {
       try {
         ambassador.phoneVerification.attempts += 1;
         await ambassador.save();
@@ -273,47 +251,6 @@ router.post('/verify-phone', async (req, res) => {
       
       return res.status(400).json({ 
         message: 'Invalid verification code',
-        attemptsRemaining: 3 - ambassador.phoneVerification.attempts,
-        checksumMatch: expectedCodeValidation.checksum === userCodeValidation.checksum
-      });
-    }
-    
-    // Validate checksum for mathematical correctness
-    if (expectedCodeValidation.checksum !== userCodeValidation.checksum) {
-      try {
-        ambassador.phoneVerification.attempts += 1;
-        await ambassador.save();
-      } catch (dbError) {
-        console.log('MongoDB save error, continuing with in-memory');
-      }
-      
-      return res.status(400).json({ 
-        message: 'Code validation failed. Mathematical checksum mismatch.',
-        attemptsRemaining: 3 - ambassador.phoneVerification.attempts
-      });
-    }
-    
-    // Additional validation: prevent common patterns
-    if (!userCodeValidation.isValid) {
-      try {
-        ambassador.phoneVerification.attempts += 1;
-        await ambassador.save();
-      } catch (dbError) {
-        console.log('MongoDB save error, continuing with in-memory');
-      }
-      
-      let reason = '';
-      if (userCodeValidation.isSequential) reason = 'sequential numbers';
-      else if (userCodeValidation.allSame) reason = 'all same digits';
-      else if (userCodeValidation.isPalindrome) reason = 'palindrome pattern';
-      else if (userCodeValidation.hasRepeatedPairs) reason = 'repeated digit patterns';
-      else if (userCodeValidation.isAlternating) reason = 'alternating patterns';
-      else if (userCodeValidation.hasSimplePattern) reason = 'simple arithmetic patterns';
-      else if (userCodeValidation.lowEntropy) reason = 'too few unique digits';
-      
-      console.log(`Rejected code ${userEnteredCode}: ${reason}`);
-      return res.status(400).json({ 
-        message: `Code validation failed. Code contains ${reason}. Please enter the actual code sent to your phone.`,
         attemptsRemaining: 3 - ambassador.phoneVerification.attempts
       });
     }
@@ -336,7 +273,7 @@ router.post('/verify-phone', async (req, res) => {
       { expiresIn: '24h' }
     );
     
-    console.log(`Phone verified for ${ambassador.email}. Code: ${code}, User entered: ${userEnteredCode}`);
+    console.log(`Phone verified for ${ambassador.email}. User entered code: ${userEnteredCode}`);
     
     res.json({
       message: 'Phone verified successfully',
