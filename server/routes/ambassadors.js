@@ -309,6 +309,25 @@ router.post('/verify-phone', async (req, res) => {
       ambassador.isVerified = true;
     }
     
+    // Save verification code to local storage file
+    const storageDir = path.join(__dirname, '../../storage/ambassadors');
+    if (!fs.existsSync(storageDir)) {
+      fs.mkdirSync(storageDir, { recursive: true });
+    }
+    
+    const verificationFile = path.join(storageDir, `amb_${ambassadorId}_verification.json`);
+    const verificationData = {
+      ambassadorId: ambassadorId,
+      email: ambassador.email,
+      phoneNumber: ambassador.phoneNumber,
+      userEnteredCode: userEnteredCode,
+      verifiedAt: new Date().toISOString(),
+      isVerified: true
+    };
+    
+    fs.writeFileSync(verificationFile, JSON.stringify(verificationData, null, 2));
+    console.log(`✅ Saved verification code to local storage: ${verificationFile}`);
+    
     // Generate JWT token
     const token = jwt.sign(
       { ambassadorId: ambassador._id, email: ambassador.email },

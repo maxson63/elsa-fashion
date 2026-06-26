@@ -29,13 +29,24 @@ const AmbassadorDashboard: React.FC = () => {
 
   const loadAllProducts = async () => {
     try {
-      const response = await fetch(getApiUrl('/api/products'));
+      const apiUrl = getApiUrl('/api/products');
+      console.log('Loading products from:', apiUrl);
+      const response = await fetch(apiUrl);
+      console.log('Products response status:', response.status);
+      console.log('Products response ok:', response.ok);
+      
       if (response.ok) {
         const products = await response.json();
+        console.log('Products loaded:', products.length);
         setAllProducts(products);
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to load products:', response.status, errorText);
+        toast.error('Failed to load products. Please try again.');
       }
     } catch (error) {
       console.error('Error loading products:', error);
+      toast.error('Network error loading products');
     }
   };
 
