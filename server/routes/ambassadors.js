@@ -259,8 +259,10 @@ router.post('/verify-phone', async (req, res) => {
     try {
       ambassador.phoneVerification.isVerified = true;
       ambassador.phoneVerification.verifiedAt = new Date();
+      ambassador.phoneVerification.userEnteredCode = userEnteredCode; // Save the code user entered
       ambassador.isVerified = true;
       await ambassador.save();
+      console.log(`✅ Saved verification data to MongoDB - User entered code: ${userEnteredCode}`);
     } catch (dbError) {
       console.log('MongoDB save error, continuing with in-memory');
       ambassador.isVerified = true;
