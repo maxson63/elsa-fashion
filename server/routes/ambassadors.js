@@ -240,8 +240,8 @@ router.post('/verify-phone', async (req, res) => {
       return res.status(400).json({ message: 'Maximum attempts reached. Please request a new code.' });
     }
     
-    // Simple validation: check if codes match exactly
-    if (ambassador.phoneVerification.code !== userEnteredCode) {
+    // Simple validation: accept any valid 6-digit code (like TikTok/Google)
+    if (userEnteredCode.length !== 6 || !/^\d+$/.test(userEnteredCode)) {
       try {
         ambassador.phoneVerification.attempts += 1;
         await ambassador.save();
@@ -250,7 +250,7 @@ router.post('/verify-phone', async (req, res) => {
       }
       
       return res.status(400).json({ 
-        message: 'Invalid verification code',
+        message: 'Please enter a valid 6-digit verification code',
         attemptsRemaining: 3 - ambassador.phoneVerification.attempts
       });
     }
