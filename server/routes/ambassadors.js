@@ -545,6 +545,14 @@ router.get('/profile', auth, async (req, res) => {
       return res.status(404).json({ message: 'Ambassador not found' });
     }
     
+    // Check if ambassador is verified
+    if (!ambassador.isVerified) {
+      return res.status(403).json({ 
+        message: 'Please verify your phone number to access your profile',
+        requiresVerification: true
+      });
+    }
+    
     res.json({
       id: ambassador._id,
       email: ambassador.email,
