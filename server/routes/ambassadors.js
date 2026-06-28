@@ -504,6 +504,14 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Ambassador not found' });
     }
     
+    // Check if ambassador is verified
+    if (!ambassador.isVerified) {
+      return res.status(403).json({ 
+        message: 'Please verify your phone number before logging in',
+        requiresVerification: true
+      });
+    }
+    
     // Generate token
     const token = jwt.sign(
       { ambassadorId: ambassador._id, type: 'ambassador' },
