@@ -133,7 +133,7 @@ app.get('/api/auth/google/callback',
     try {
       const jwt = require('jsonwebtoken');
       const token = jwt.sign(
-        { ambassadorId: req.user._id, email: req.user.email },
+        { ambassadorId: req.user._id, email: req.user.email, type: 'ambassador' },
         process.env.JWT_SECRET || 'your-secret-key',
         { expiresIn: '7d' }
       );
