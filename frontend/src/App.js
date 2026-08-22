@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import BottomNavigation from './components/BottomNavigation';
@@ -20,7 +20,49 @@ import UserLogin from './pages/UserLogin';
 import UserRegister from './pages/UserRegister';
 import DeliveryTracking from './pages/DeliveryTracking';
 import { CartProvider } from './contexts/CartContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { getApiUrl } from './config/api';
+
+// Handle Google OAuth token at app level
+const OAuthTokenHandler = () => {
+  const { setAuthState } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+      // Store token and get user info
+      localStorage.setItem('ambassadorToken', token);
+      fetch(getApiUrl('/api/ambassadors/profile'), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.id) {
+            setAuthState(token, {
+              _id: data.id,
+              email: data.email,
+              isVerified: data.isVerified,
+              balance: data.balance,
+              clearanceStatus: data.clearanceStatus,
+              clearancePaymentStatus: data.clearancePaymentStatus || 'pending'
+            });
+            // Clear token from URL
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching profile after Google auth:', err);
+        });
+    }
+  }, [location.search, setAuthState]);
+
+  return null;
+};
 
 function App() {
   return (
@@ -30,6 +72,7 @@ function App() {
           <div className="min-h-screen bg-white pb-16 sm:pb-20">
             <Navbar />
             <main>
+              <OAuthTokenHandler />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/shop" element={<Shop />} />
