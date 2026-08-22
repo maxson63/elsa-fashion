@@ -614,6 +614,38 @@ router.post('/select-outfits', auth, async (req, res) => {
   }
 });
 
+// Update selected outfits (for frontend)
+router.post('/update-outfits', async (req, res) => {
+  try {
+    const { email, selectedOutfits } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    if (!selectedOutfits || selectedOutfits.length !== 3) {
+      return res.status(400).json({ message: 'You must select exactly 3 outfits' });
+    }
+    
+    const ambassador = await Ambassador.findOneAndUpdate(
+      { email },
+      { selectedOutfits },
+      { new: true }
+    );
+    
+    if (!ambassador) {
+      return res.status(404).json({ message: 'Ambassador not found' });
+    }
+    
+    res.json({
+      message: 'Outfits updated successfully',
+      selectedOutfits: ambassador.selectedOutfits
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating outfits', error: error.message });
+  }
+});
+
 // Submit clearance
 router.post('/submit-clearance', auth, async (req, res) => {
   try {
