@@ -32,7 +32,11 @@ const OAuthTokenHandler = () => {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('token');
 
+    console.log('OAuthTokenHandler: Checking for token in URL');
+    console.log('OAuthTokenHandler: Token found:', !!token);
+
     if (token) {
+      console.log('OAuthTokenHandler: Storing token and fetching profile');
       // Store token and get user info
       localStorage.setItem('ambassadorToken', token);
       fetch(getApiUrl('/api/ambassadors/profile'), {
@@ -40,9 +44,14 @@ const OAuthTokenHandler = () => {
           'Authorization': `Bearer ${token}`
         }
       })
-        .then(res => res.json())
+        .then(res => {
+          console.log('OAuthTokenHandler: Profile response status:', res.status);
+          return res.json();
+        })
         .then(data => {
+          console.log('OAuthTokenHandler: Profile data:', data);
           if (data.id) {
+            console.log('OAuthTokenHandler: Setting auth state');
             setAuthState(token, {
               _id: data.id,
               email: data.email,
@@ -53,10 +62,13 @@ const OAuthTokenHandler = () => {
             });
             // Clear token from URL
             window.history.replaceState({}, '', window.location.pathname);
+            console.log('OAuthTokenHandler: Token cleared from URL');
+          } else {
+            console.error('OAuthTokenHandler: No id in profile data');
           }
         })
         .catch(err => {
-          console.error('Error fetching profile after Google auth:', err);
+          console.error('OAuthTokenHandler: Error fetching profile:', err);
         });
     }
   }, [location.search, setAuthState]);
