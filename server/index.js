@@ -46,10 +46,10 @@ app.use(cors({
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 500, // limit each IP to 500 requests per windowMs (increased from 100)
   skip: (req) => {
-    // Skip rate limiting for health check
-    return req.path === '/health';
+    // Skip rate limiting for health check and products endpoint
+    return req.path === '/health' || req.path.startsWith('/api/products');
   }
 });
 app.use(limiter);
