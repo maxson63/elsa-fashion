@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Gift, DollarSign, FileText, LogOut, Settings, ShoppingBag, Camera, Upload, RefreshCw, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -7,6 +7,7 @@ import { getApiUrl } from '../config/api';
 
 const AmbassadorDashboard: React.FC = () => {
   const { ambassador, logout } = useAuth();
+  const navigate = useNavigate();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [clearanceSubmissions, setClearanceSubmissions] = useState<any[]>([]);
@@ -163,9 +164,9 @@ const AmbassadorDashboard: React.FC = () => {
         });
         setShowOutfitSelection(false);
         
-        // Automatically show clearance form after saving outfits
+        // Automatically navigate to clearance form after saving outfits
         setTimeout(() => {
-          setShowProfileManagement(true);
+          navigate('/ambassador/clearance');
         }, 1000);
       } else {
         const errorText = responseData;
