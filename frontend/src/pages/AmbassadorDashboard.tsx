@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { getApiUrl } from '../config/api';
 
 const AmbassadorDashboard: React.FC = () => {
-  const { ambassador, logout } = useAuth();
+  const { ambassador, logout, setAuthState } = useAuth();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [clearanceSubmissions, setClearanceSubmissions] = useState<any[]>([]);
@@ -17,6 +17,38 @@ const AmbassadorDashboard: React.FC = () => {
 
   // Load profile picture on component mount
   useEffect(() => {
+    // Check for Google OAuth token in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    if (token) {
+      // Store token and get user info
+      localStorage.setItem('ambassadorToken', token);
+      fetch(getApiUrl('/api/ambassadors/profile'), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.id) {
+            setAuthState(token, {
+              _id: data.id,
+              email: data.email,
+              isVerified: data.isVerified,
+              balance: data.balance,
+              clearanceStatus: data.clearanceStatus,
+              clearancePaymentStatus: data.clearancePaymentStatus || 'pending'
+            });
+            // Clear token from URL
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching profile after Google auth:', err);
+        });
+    }
+    
     if (ambassador?._id) {
       loadProfilePicture();
       loadClearanceSubmissions();
@@ -25,7 +57,7 @@ const AmbassadorDashboard: React.FC = () => {
       setSelectedOutfits(Array.isArray(ambassador?.selectedOutfits) ? ambassador.selectedOutfits : []);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ambassador]);
+  }, [ambassador, setAuthState]);
 
   const loadAllProducts = async () => {
     try {
