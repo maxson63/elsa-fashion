@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Gift, DollarSign, FileText, LogOut, Settings, ShoppingBag, Camera, Upload, RefreshCw, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,18 +14,20 @@ const AmbassadorDashboard: React.FC = () => {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [selectedOutfits, setSelectedOutfits] = useState<any[]>([]);
   const [showProfileManagement, setShowProfileManagement] = useState(false);
+  const isInitialized = useRef(false);
 
   // Load profile picture on component mount
   useEffect(() => {
-    if (ambassador?._id) {
+    if (ambassador?._id && !isInitialized.current) {
       loadProfilePicture();
       loadClearanceSubmissions();
       loadAllProducts();
-      // Initialize selected outfits from ambassador data
+      // Initialize selected outfits from ambassador data only once
       setSelectedOutfits(Array.isArray(ambassador?.selectedOutfits) ? ambassador.selectedOutfits : []);
+      isInitialized.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ambassador]);
+  }, [ambassador?._id]);
 
   const loadAllProducts = async () => {
     try {
