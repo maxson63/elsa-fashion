@@ -48,10 +48,11 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 500, // limit each IP to 500 requests per windowMs (increased from 100)
   skip: (req) => {
-    // Skip rate limiting for health check, products, and ambassador endpoints
+    // Skip rate limiting for health check, products, ambassador, and profile endpoints
     return req.path === '/health' || 
            req.path.startsWith('/api/products') ||
-           req.path.startsWith('/api/ambassadors');
+           req.path.startsWith('/api/ambassadors') ||
+           req.path.startsWith('/api/profile');
   }
 });
 app.use(limiter);
