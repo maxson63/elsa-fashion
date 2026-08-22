@@ -102,8 +102,12 @@ const ambassadorSchema = new mongoose.Schema({
     }
   },
   selectedOutfits: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
+    id: String,
+    name: String,
+    price: Number,
+    image: String,
+    category: String,
+    selectedAt: Date
   }],
   balance: {
     type: Number,
