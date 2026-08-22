@@ -163,9 +163,9 @@ const AmbassadorDashboard: React.FC = () => {
         });
         setShowOutfitSelection(false);
         
-        // Update ambassador data in context
+        // Automatically show clearance form after saving outfits
         setTimeout(() => {
-          window.location.reload(); // Simple refresh to update the display
+          setShowProfileManagement(true);
         }, 1000);
       } else {
         const errorText = responseData;
