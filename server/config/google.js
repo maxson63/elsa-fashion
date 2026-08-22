@@ -19,7 +19,11 @@ passport.use(new GoogleStrategy({
     let ambassador = await Ambassador.findOne({ email: profile.emails[0].value });
     
     if (ambassador) {
-      // User exists, return them
+      // User exists, ensure they're verified (Google users are pre-verified)
+      if (!ambassador.isVerified) {
+        ambassador.isVerified = true;
+        await ambassador.save();
+      }
       return done(null, ambassador);
     } else {
       // Create new ambassador
